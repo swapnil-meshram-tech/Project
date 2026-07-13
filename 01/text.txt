@@ -1,0 +1,568 @@
+<link href="/src/style.css" rel="stylesheet">
+
+
+
+📚 Backend Fundamentals
+
+Node.js & Express
+
+Express server setup
+Middleware
+Routing
+Request/Response handling
+
+
+HTTP Methods & Status Codes
+
+GET, POST, PUT, DELETE, PATCH
+200, 201, 400, 401, 403, 404, 409, 500
+
+
+Environment Configuration
+
+.env files
+dotenv package
+Configuration validation
+
+
+
+
+🗄️ Database & MongoDB
+
+MongoDB Connection
+
+Mongoose setup
+Database connection
+Connection events
+Graceful disconnection
+
+
+Data Modeling
+
+Schema definition
+Field types
+Validation
+Indexes
+Timestamps
+
+
+Database Operations
+
+Create (User.create)
+Read (User.find, findById)
+Update (findByIdAndUpdate)
+Delete (findByIdAndDelete)
+Query filters ($or, $set)
+
+
+Pre-save Hooks
+
+Password hashing
+Token hashing
+Data transformation before save
+
+
+Instance Methods
+
+comparePassword()
+compareRefreshToken()
+
+
+
+
+🔐 Authentication & Authorization
+
+Password Security
+
+bcryptjs hashing
+Salt generation (genSalt)
+Password comparison
+
+
+JWT (JSON Web Tokens)
+
+Token generation
+Token verification
+Token expiry
+Token claims (payload)
+Secret keys
+
+
+Token Types
+
+Access Token (short-lived, 15m)
+Refresh Token (long-lived, 7d)
+Token rotation
+
+
+Authentication Flow
+
+Register
+Login
+Token generation
+Token verification
+
+
+Authorization
+
+Role-based access control (RBAC)
+User roles (user, admin)
+Permission checking
+
+
+Middleware
+
+verifyAccessToken
+verifyRefreshToken
+authorize (role checking)
+
+
+
+
+🎯 API Endpoints & Controllers
+
+Auth Endpoints
+
+POST /register
+POST /login
+POST /refresh-token
+POST /logout
+
+
+User Endpoints
+
+GET /profile
+PUT /profile
+PUT /change-password
+DELETE /profile
+
+
+Admin Endpoints
+
+GET /users (with pagination)
+GET /users/:id
+PUT /users/:id/role
+PUT /users/:id/deactivate
+PUT /users/:id/activate
+
+
+Controller Functions
+
+register()
+login()
+logout()
+refreshAccessToken()
+getProfile()
+updateProfile()
+getAllUsers()
+getUserById()
+updateUserRole()
+deactivateUser()
+activateUser()
+
+
+
+
+🔄 Request/Response Handling
+
+Request Validation
+
+Checking required fields
+Format validation
+MongoDB ID validation
+Password validation
+
+
+Error Handling
+
+Try-catch blocks
+Error middleware
+Global error handler
+Custom error classes
+
+
+Response Format
+
+Success responses
+Error responses
+Status codes
+JSON structure
+
+
+Cookies
+
+HTTP-only cookies
+Secure flag
+SameSite attribute
+Cookie expiry
+clearCookie()
+
+
+
+
+🛡️ Security Features
+
+Token Security
+
+HTTP-only cookies (XSS protection)
+JWT signing
+Token verification
+Token expiry
+Token rotation
+
+
+Password Security
+
+Bcrypt hashing
+Salt generation
+Password comparison
+
+
+Access Control
+
+Authentication checks
+Authorization checks
+Role-based access
+Self-protection guards
+
+
+Headers & CORS
+
+Helmet.js
+CORS setup
+Origin validation
+
+
+
+
+📊 Database Query Patterns
+
+Find Operations
+
+find() - get all
+findById() - get by ID
+findOne() - get one
+countDocuments() - count
+
+
+Update Operations
+
+findByIdAndUpdate()
+Direct save()
+Selective updates
+
+
+Delete Operations
+
+findByIdAndDelete()
+Soft delete (isActive flag)
+
+
+Query Optimization
+
+Indexing
+Field selection (.select)
+Promise.all() for parallel queries
+
+
+Operators
+
+$or (OR condition)
+$set (set values)
+$regex (pattern matching)
+
+
+
+
+🏗️ Architecture & Patterns
+
+Project Structure
+
+Models
+Controllers
+Routes
+Middleware
+Utilities
+Config
+
+
+MVC Pattern
+
+Model (User schema)
+View (JSON responses)
+Controller (business logic)
+
+
+Middleware Chain
+
+Authentication
+Authorization
+Validation
+Error handling
+
+
+Separation of Concerns
+
+Token generation (utils)
+Error handling (middleware)
+Auth logic (controllers)
+Validation (middleware)
+
+
+
+
+🔧 Utilities & Helpers
+
+Token Generation
+
+generateAccessToken()
+generateRefreshToken()
+
+
+Validation
+
+isValidObjectId()
+Email regex
+Password validation
+
+
+Error Handling
+
+Custom error classes
+Global error handler
+Error middleware
+
+
+
+
+📦 NPM Packages Used
+
+Core
+
+express
+mongoose
+dotenv
+
+
+Security
+
+bcryptjs
+jsonwebtoken
+helmet
+cors
+
+
+Utilities
+
+cookie-parser
+morgan
+http (built-in)
+
+
+
+
+🚀 Deployment & DevOps
+
+Environment Management
+
+Development
+Production
+Environment variables
+
+
+Server Management
+
+Graceful shutdown
+Process handlers
+Error logging
+
+
+Database
+
+Connection strings
+Authentication
+Error handling
+
+
+
+
+✅ Complete Backend Skills Covered
+✓ Database Design & Modeling
+✓ Authentication & Authorization
+✓ JWT Token Management
+✓ Password Hashing
+✓ REST API Design
+✓ Error Handling
+✓ Middleware Development
+✓ Route Management
+✓ CRUD Operations
+✓ Security Best Practices
+✓ Code Organization
+✓ Production-Ready Code
+✓ Testing Patterns
+✓ Graceful Shutdown
+
+
+
+
+
+
+# Topic List for Parts 3–7
+
+---
+
+## Part 3: Architecture & Design
+1. Layered Architecture
+2. Layer Responsibilities (Routes, Controller, Service, Repository)
+3. MVC Pattern
+4. Model (Schema, Methods, Statics, Virtuals)
+5. Separation of Concerns
+6. Middleware Pipeline
+7. Standardized Response Structure
+8. Custom Error Classes
+
+---
+
+## Part 4: Optimization
+1. Database Indexing
+   - Single Field Index
+   - Compound Index
+   - Sparse Index
+   - TTL Index
+   - Text Index
+2. Query Optimization
+   - Field Selection
+   - lean()
+   - N+1 Problem
+   - populate()
+   - Aggregation Pipeline
+   - Cursor Pagination vs Offset Pagination
+
+3. Response Compression
+4. 
+
+
+
+---
+
+## Part 5: Caching
+1. Why Caching
+2. Redis Setup & Connection
+3. Core Cache Operations (get, set, del, delPattern)
+4. Cache-Aside Pattern
+5. Cache Middleware (HTTP Response Caching)
+6. Service-Level Caching
+7. Cache Invalidation Strategies
+   - TTL Expiry
+   - Event-Driven Invalidation
+   - Cache Versioning
+8. Cache Key Design
+
+---
+
+## Part 6: Testing
+1. Jest Configuration
+2. In-Memory MongoDB Setup
+3. Test Lifecycle Hooks (beforeAll, afterEach, afterAll)
+4. Unit Testing
+   - Mocking Dependencies
+   - Testing Business Logic
+   - Testing Error Cases
+5. Integration Testing
+   - Supertest
+   - Full Request Pipeline
+   - Testing Protected Routes
+   - Testing Validation
+6. Coverage Thresholds
+
+---
+
+## Part 7: Deployment
+1. Dockerfile
+   - Multi-Stage Builds
+   - Non-Root User
+   - Health Check
+2. Docker Compose
+   - Service Dependencies
+   - Named Volumes
+   - Internal Networks
+   - Environment Variables
+3. Nginx Reverse Proxy
+4. CI/CD with GitHub Actions
+   - Test Job
+   - Build & Push Docker Image
+   - Deploy Job
+   - Secrets Management
+   - Environment Approvals
+
+---
+
+## Part 8: Monitoring
+1. Performance Monitoring Middleware
+2. Response Time Tracking
+3. Health Check Endpoint
+4. Structured Logging (Winston)
+   - Log Levels
+   - Log Rotation
+   - Dev vs Production Formats
+5. Global Error Handler
+   - Operational vs Programming Errors
+6. Unhandled Rejection & Uncaught Exception Handling
+7. Full App Assembly Order
+
+
+
+
+
+Simple breakdown — **which check, on which routes**, and why.
+
+## The three layers of checking
+
+| Layer | What it checks | Cost |
+|---|---|---|
+| **Token verify** (`verifyAccessToken` / `verifyRefreshToken`) | Is the JWT signature valid? Not expired? Has `jti`? | Cheap — no DB call |
+| **Active session** (`verifyActiveSession`) | Does the DB session exist, match hashed token, not revoked, not expired? Is the user active? | Expensive — DB call |
+| **Role/permission** (`authorize(...)`) | Does this user have permission for this specific action? | Cheap — just checks `req.user.role` |
+
+## Simple rule: match the check to what the route actually needs
+
+**Routes that just need "is this a logged-in user" (most routes)**
+→ Token verify + Active session (full check)
+
+```
+/profile        → verifyAccessToken + verifyActiveSession
+/logout         → verifyAccessToken + verifyActiveSession
+/update-account → verifyAccessToken + verifyActiveSession
+/change-password → verifyAccessToken + verifyActiveSession
+```
+
+Why full check here: these routes change or reveal user data — you want to be sure the session isn't stolen/revoked, not just that the JWT signature is technically valid.
+
+**The one route that uses the refresh token instead**
+```
+/refresh-token → verifyRefreshToken + verifyActiveSession
+```
+Same full check, just via the refresh token (cookie) instead of access token (header), because that's the credential this route receives.
+
+**Route that needs NO session at all**
+```
+/forgot-password → no auth middleware
+/reset-password  → verified by reset token (emailed link), not session
+/login           → no auth middleware
+/register        → no auth middleware
+```
+Makes sense — user has no valid session yet, that's *why* they're on this route.
+
+**Routes that need role on top of session**
+```
+/admin/users     → verifyAccessToken + verifyActiveSession + authorize('admin')
+/delete-user/:id → verifyAccessToken + verifyActiveSession + authorize('admin')
+```
+
+## Best practice — the actual rule of thumb
+
+> **If the route touches user data or performs an action on behalf of a user → full session check (token + DB validation).**
+> **If the route is public or the user isn't authenticated yet → no session check, use a different mechanism (reset token, credentials).**
+> **If the route also needs a specific privilege level → add `authorize()` after the session check, never before.**
+
+Order always matters: `verifyToken → verifyActiveSession → authorize` — never skip the DB session check just because the JWT is valid, since that's exactly what lets you catch revoked/stolen tokens.
