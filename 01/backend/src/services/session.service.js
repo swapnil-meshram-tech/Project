@@ -36,55 +36,55 @@ const revokeActiveSession = async (sessionId) => {
     .lean()
 }
 
-// const updateSession = async (sessionId, userId, userAgent, ip, newRefreshToken) => {
-//     if(!sessionId || !userId || !userAgent || !ip || !newRefreshToken) throw new Error('updateSession: All fields required.')
+const updateSession = async (sessionId, userId, userAgent, ip, newRefreshToken) => {
+    if(!sessionId || !userId || !userAgent || !ip || !newRefreshToken) throw new Error('updateSession: All fields required.')
 
-//     const hashedToken = hashToken(newRefreshToken)
-//     const expiresAt = getSessionExpiry()
+    const hashedToken = hashToken(newRefreshToken)
+    const expiresAt = getSessionExpiry()
 
-//     return Session.findOneAndUpdate({ 
-//         _id: sessionId, 
-//         userId, 
-//         isRevoked: false 
-//         },
-//         { $set: { 
-//             userAgent, 
-//             ip, 
-//             refreshToken: hashedToken, 
-//             expiresAt 
-//             } 
-//         },
-//         { returnDocument: 'after' }
-//     )
-//     .lean()
+    return Session.findOneAndUpdate({ 
+        _id: sessionId, 
+        userId, 
+        isRevoked: false 
+        },
+        { $set: { 
+            userAgent, 
+            ip, 
+            refreshToken: hashedToken, 
+            expiresAt 
+            } 
+        },
+        { returnDocument: 'after' }
+    )
+    .lean()
 
-//     // return Session.findByIdAndUpdate(  // ✅ findByIdAndUpdate — have _id, cleaner than findOneAndUpdate
-//     //     sessionId,
-//     //     { $set: { 
-//     //         userAgent,
-//     //         ip, 
-//     //         refreshToken: hashedToken,
-//     //         expiresAt 
-//     //     }},
-//     //     { new: true }  // ✅ 'new: true' Mongoose option — same as returnDocument: 'after'
-//     // )
-//     // .lean()
-// }
-// const revokeAllDeviceSessions = async (userId) => {
-//     if(!userId) return false
+    // return Session.findByIdAndUpdate(  // ✅ findByIdAndUpdate — have _id, cleaner than findOneAndUpdate
+    //     sessionId,
+    //     { $set: { 
+    //         userAgent,
+    //         ip, 
+    //         refreshToken: hashedToken,
+    //         expiresAt 
+    //     }},
+    //     { new: true }  // ✅ 'new: true' Mongoose option — same as returnDocument: 'after'
+    // )
+    // .lean()
+}
+const revokeAllDeviceSessions = async (userId) => {
+    if(!userId) return false
 
-//     return Session.updateMany({ 
-//         userId,  
-//         isRevoked: false 
-//         },
-//         { $set: { 
-//             refreshToken: null,
-//             isRevoked: true, 
-//             revokedAt: new Date() 
-//           } 
-//         }
-//     )
-// }
+    return Session.updateMany({ 
+        userId,  
+        isRevoked: false 
+        },
+        { $set: { 
+            refreshToken: null,
+            isRevoked: true, 
+            revokedAt: new Date() 
+          } 
+        }
+    )
+}
 
 module.exports = { 
     createSession, 
