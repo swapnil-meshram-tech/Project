@@ -3,8 +3,9 @@
   "version": "1.0.0",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
     "dev": "docker start redis && nodemon server.js",
+    "test": "jest",
+    "test:watch": "jest --watch",
     "start": "docker start redis && node server.js"
   },
   "keywords": [],

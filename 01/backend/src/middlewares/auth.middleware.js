@@ -5,7 +5,7 @@ const { hashToken } = require('../utils/crypto.utils')
 const { verifyTokenBlacklisted } = require('../utils/blacklist.utils')
 const { verifyJwtToken } = require('../utils/jwt.utils')
 const { verifyUserById } = require('../repositories/user.repository')
-const { AppError } = require('../utils/apperror.utils')
+const { AppError } = require('../utils/apperror.utils.js')
 
 const verifyAccessToken = async (req, res, next) => {
     try {

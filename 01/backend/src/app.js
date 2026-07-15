@@ -64,7 +64,7 @@ app.use('/api/v1/auth', authRouter)
 // app.use('/api/v1/admin', adminRouter)
 // app.use('/api/v1/user', userRouter)
 
-// app.use(notFoundErrorHandler)
-// app.use(globalErrorHandler)
+app.use(notFoundErrorHandler)
+app.use(globalErrorHandler)
 
 module.exports = app

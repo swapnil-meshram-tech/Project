@@ -5,6 +5,7 @@ const { verifyUserExistence, verifyUserCredentials, createUser } = require('../r
 const { generateAccessToken, generateRefreshToken } = require('../utils/jwt.utils')
 const { createSession, revokeActiveSession, revokeAllSession } = require('../services/session.service')
 const { tokenBlacklisting } = require('../utils/blacklist.utils')
+const { AppError } = require('../utils/apperror.utils.js')
 
 const register = async (req, res, next) =>{
     try{
