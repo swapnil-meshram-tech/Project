@@ -12,7 +12,7 @@ const verifyAccessToken = async (req, res, next) => {
         const authHeader = req.headers.authorization || req.headers.Authorization
         
         if(!authHeader?.startsWith('Bearer ')){
-            console.error('Access token not found in Authorization header. Received:',authHeader)
+            // console.error('Access token not found in Authorization header. Received:',authHeader)
 
             throw new AppError('Invalid or expired token.', 401)
         }
@@ -25,7 +25,7 @@ const verifyAccessToken = async (req, res, next) => {
 
         const decoded = verifyJwtToken(accessToken, config.JWT_ACCESS_SECRET)
 
-        console.log(decoded)
+        // console.log(decoded)
 
         if (!decoded?.jti || !decoded?.sessionId) {
             console.error('Token has no jti or sessionId claim.')

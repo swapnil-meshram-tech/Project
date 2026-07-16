@@ -4,7 +4,7 @@ const { generateUUID } = require('../utils/crypto.utils')
 const { AppError } = require('../utils/apperror.utils')
 
 const generateAccessToken = (userId, role, sessionId) =>{
-   if(!userId) throw new Error('userId and role are required.')
+   if(!userId || !role || !sessionId) throw new Error('All fields are required.')
 
    return jwt.sign({
            id: userId,
@@ -30,10 +30,11 @@ const generateRefreshToken = (userId) =>{
 }
 
 const verifyJwtToken = (token, secret) => {
-    if (!token || !secret) throw new AppError('Token and secret are required.', 400)
+    if (!token || !secret) throw new Error('Token and secret are required.')
 
     try {
         return jwt.verify(token, secret)
+
     } catch (err) {
         throw new AppError('Invalid or expired token.', 401)
     }

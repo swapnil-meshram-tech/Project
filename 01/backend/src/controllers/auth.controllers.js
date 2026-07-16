@@ -39,7 +39,7 @@ const register = async (req, res, next) =>{
 
         const user = await createUser(username, email, password)
 
-        const refreshToken = generateRefreshToken('')
+        const refreshToken = generateRefreshToken(user._id)
         
         const ip = req.ip || req.headers['x-forwarded-for']?.split(',')[0].trim() || req.socket?.remoteAddress || 'unknown'
         const userAgent = req.headers['user-agent'] || 'unknown'
@@ -77,23 +77,25 @@ const login = async (req, res, next) =>{
         const { identifier, password } = req.body
 
         if(!identifier || !password){
-            console.error('Login error: All fields are required.')
+            // console.error('Login error: All fields are required.')
 
             throw new AppError('All fields are required.', 400)
         }
 
         const user = await verifyUserCredentials(identifier)
 
-        if (!user || user.isActive === false) {
-            console.error(`Login error: User is not present / active`)
+        if (!user) {
+             throw new AppError('Invalid credentials.', 401) // stay vague — don't confirm non-existent accounts
+        }
 
-            throw new AppError('Invalid credentials.', 401)
+        if (user.isActive === false) {
+            throw new AppError('Your account has been deactivated. Please contact support.', 403)
         }
 
         const isPasswordValid = await user.comparePassword(password)
 
         if(!isPasswordValid){
-            console.error(`Login error: Password is invalid.`)
+            // console.error(`Login error: Password is invalid.`)
 
             throw new AppError('Invalid credentials.', 401)
         }

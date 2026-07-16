@@ -48,7 +48,7 @@ userSchema.index({ email: 1, isActive: 1 })
 userSchema.pre('save', async function() {
     if (!this.isModified('password')) return 
         
-    const salt = await bcrypt.genSalt(12); // Cost factor 12 balances strong security and server speed
+    const salt = await bcrypt.genSalt(12)       // Cost factor 12 balances strong security and server speed
     this.password = await bcrypt.hash(this.password, salt)
 
 })

@@ -10,9 +10,9 @@ const globalErrorHandler = (err, req, res, next) =>{
     const location = err.stack.split('\n')[1]?.trim()
     const type = err.isOperational ? 'CLIENT ERROR' : 'SERVER ERROR'
     
-    console.error(`[${statusCode}] ${req.method} ${req.originalUrl}`)
+    console.error(`\n[${statusCode}] ${req.method} ${req.originalUrl}`)
     console.error(`\n${type} - ${err.message}`)
-    console.error(`\t↳ ${location}`)
+    console.error(`\t↳ ${location}\n`)
     
     const message = err.isOperational ? err.message : 'Internal server error'
 

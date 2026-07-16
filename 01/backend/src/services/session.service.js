@@ -4,7 +4,7 @@ const { hashToken } = require('../utils/crypto.utils')
 const getSessionExpiry = () => new Date(Date.now() + 7 * 24 * 60 * 60 * 1000)
 
 const createSession = async (userId, userAgent, ip, refreshToken) =>{
-    if(!userId || !userAgent || !ip || !refreshToken) throw new Error('createSession: All fields required.')
+    if(!userId || !userAgent || !ip || !refreshToken) throw new Error('All fields are required.')
 
     const hashedToken = hashToken(refreshToken)
     const expiresAt = getSessionExpiry()
