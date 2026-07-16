@@ -1,6 +1,7 @@
 const jwt = require('jsonwebtoken')
 const config = require('../configs/env')
 const { generateUUID } = require('../utils/crypto.utils')
+const { AppError } = require('../utils/apperror.utils')
 
 const generateAccessToken = (userId, role, sessionId) =>{
    if(!userId) throw new Error('userId and role are required.')
@@ -28,10 +29,14 @@ const generateRefreshToken = (userId) =>{
    )
 }
 
-const verifyJwtToken = (token, secret) =>{
-   if(!token || !secret) throw new Error('Token and secret are required.')
+const verifyJwtToken = (token, secret) => {
+    if (!token || !secret) throw new AppError('Token and secret are required.', 400)
 
-   return jwt.verify(token, secret)
+    try {
+        return jwt.verify(token, secret)
+    } catch (err) {
+        throw new AppError('Invalid or expired token.', 401)
+    }
 }
 
 module.exports = {

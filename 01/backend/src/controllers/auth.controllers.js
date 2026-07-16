@@ -12,27 +12,27 @@ const register = async (req, res, next) =>{
         const { username, email, password, confirmPassword } = req.body
 
         if(!username || !email || !password || !confirmPassword){
-            console.error('Registeration error: All fields are required.')
+            // console.error('Registeration error: All fields are required.')
             
             throw new AppError('All fields are required.', 400)
         }
 
         if(password.length < 8){
-            console.error('Registeration error: Password must be at least 8 characters.')
+            // console.error('Registeration error: Password must be at least 8 characters.')
             
             throw new AppError('Password must be at least 8 characters.', 400)
         }
 
         if(password !== confirmPassword){
-            console.error('Registeration error: Passwords do not match.')
+            // console.error('Registeration error: Passwords do not match.')
 
             throw new AppError('Passwords do not match.', 400)
         }
 
-        const isUserExists = await verifyUserExistence(username, email)
+        const isUserExists = await verifyUserExistence('', email)
 
         if(isUserExists){
-            console.error('Registeration error: User already exists.')
+            // console.error('Registeration error: User already exists.')
 
             throw new AppError('User already exists.', 409)
         }
