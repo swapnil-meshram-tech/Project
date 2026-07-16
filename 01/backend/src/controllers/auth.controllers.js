@@ -29,7 +29,7 @@ const register = async (req, res, next) =>{
             throw new AppError('Passwords do not match.', 400)
         }
 
-        const isUserExists = await verifyUserExistence('', email)
+        const isUserExists = await verifyUserExistence(username, email)
 
         if(isUserExists){
             // console.error('Registeration error: User already exists.')
@@ -39,7 +39,7 @@ const register = async (req, res, next) =>{
 
         const user = await createUser(username, email, password)
 
-        const refreshToken = generateRefreshToken(user._id)
+        const refreshToken = generateRefreshToken('')
         
         const ip = req.ip || req.headers['x-forwarded-for']?.split(',')[0].trim() || req.socket?.remoteAddress || 'unknown'
         const userAgent = req.headers['user-agent'] || 'unknown'

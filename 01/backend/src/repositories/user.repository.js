@@ -1,7 +1,7 @@
 const User = require('../models/user.model')
 
 const verifyUserExistence = async(username, email) =>{
-    if(!username || !email) throw new Error('verifyUserExistence: username and email are required.')
+    if(!username || !email) throw new Error('Username and email are required.')
 
     return User.findOne({
         $or: [  
@@ -26,8 +26,7 @@ const verifyUserCredentials = async(identifier) =>{
 }
 
 const createUser = async(username, email, password) =>{
-    if(!username || !email || !password) throw new Error('createUser: All fields required.')
-
+    if(!username || !email || !password) throw new Error('All fields are required.')
 
     return User.create({
         username,

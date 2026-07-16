@@ -8,9 +8,11 @@ const notFoundErrorHandler = (req, res, next) =>{
 const globalErrorHandler = (err, req, res, next) =>{
     const statusCode = err.statusCode || 500
     const location = err.stack.split('\n')[1]?.trim()
+    const type = err.isOperational ? 'CLIENT ERROR' : 'SERVER ERROR'
     
-    console.error(`[${statusCode}] ${req.method} ${req.originalUrl} - ${err.message}`)
-    console.error(`   ↳ ${location}`)
+    console.error(`[${statusCode}] ${req.method} ${req.originalUrl}`)
+    console.error(`\n${type} - ${err.message}`)
+    console.error(`\t↳ ${location}`)
     
     const message = err.isOperational ? err.message : 'Internal server error'
 
