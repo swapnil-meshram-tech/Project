@@ -69,8 +69,8 @@ const verifyRefreshToken = async (req, res, next) => {
 
         const decoded = verifyJwtToken(refreshToken, config.JWT_REFRESH_SECRET)
 
-        if (!decoded?.jti) {
-            console.error('Token has no jti claim.')
+        if (!decoded?.id || !decoded?.jti) {
+            // console.error('Token has no jti claim.')
 
             throw new AppError('Invalid or expired token.', 401)
         }
@@ -106,10 +106,6 @@ const verifyActiveSession = async (req, res, next) => {
         const userAgent = req.headers['user-agent'] || 'unknown'
         
         const refreshToken = req.cookies?.refreshToken
-        
-        if(!refreshToken){
-            throw new AppError('Invalid or expired token.', 401)
-        }  
 
         const hashedToken = hashToken(refreshToken)
 
