@@ -35,9 +35,9 @@ const verifyAccessToken = async (req, res, next) => {
         
         const isBlacklisted = await verifyTokenBlacklisted(decoded.jti, 'access')
                 
-        // if(isBlacklisted){
-        //     throw new AppError('Invalid or expired token.', 401)
-        // }
+        if(isBlacklisted){
+            throw new AppError('Invalid or expired token.', 401)
+        }
 
         req.user = {
             id: decoded.id,
@@ -55,22 +55,6 @@ const verifyAccessToken = async (req, res, next) => {
     } catch(err){
         // console.error('Access token verification error:',err.message)
 
-        next(err)
-    }
-}
-
-const verifyActiveUser = async (req, res, next) => {
-    try {
-        const user = await verifyUserById(req.user?.id)
-
-        if (!user || user.isActive === false) {
-            throw new AppError('Account inactive.', 401)
-        }
-
-        next()
-
-    } catch (err) {
-        console.error('User active check error:', err.message)
         next(err)
     }
 }
@@ -199,6 +183,22 @@ const verifyActiveSession = async (req, res, next) => {
     } catch (err) {
         console.error('Session verification error:', err.message)
         
+        next(err)
+    }
+}
+
+const verifyActiveUser = async (req, res, next) => {
+    try {
+        const user = await verifyUserById(req.user?.id)
+
+        if (!user || user.isActive === false) {
+            throw new AppError('Account inactive.', 401)
+        }
+
+        next()
+
+    } catch (err) {
+        console.error('User active check error:', err.message)
         next(err)
     }
 }
