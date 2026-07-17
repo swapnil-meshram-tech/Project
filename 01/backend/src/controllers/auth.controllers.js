@@ -1,9 +1,7 @@
-const User = require('../models/user.model')
-const Session = require('../models/session.model')
 const { REFRESH_COOKIE_OPTIONS, REFRESH_COOKIE_MAX_AGE } = require('../configs/cookie.config.js')
 const { verifyUserExistence, verifyUserCredentials, createUser } = require('../repositories/user.repository')
-const { generateAccessToken, generateRefreshToken } = require('../utils/jwt.utils')
 const { createSession,deleteSession, revokeActiveSession, revokeAllSession } = require('../services/session.service')
+const { generateAccessToken, generateRefreshToken } = require('../utils/jwt.utils')
 const { tokenBlacklisting } = require('../utils/blacklist.utils')
 const { AppError } = require('../utils/apperror.utils.js')
 

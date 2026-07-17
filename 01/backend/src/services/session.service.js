@@ -19,6 +19,22 @@ const createSession = async (userId, userAgent, ip, refreshToken) =>{
     })
 }
 
+const verifySession = async (userId, userAgent, ip, refreshToken) =>{
+    if(!userId || !userAgent || !ip || !refreshToken) throw new Error('All fields are required.')
+
+    const hashedToken = hashToken(refreshToken)
+
+    return Session.findOne({
+        userId,
+        userAgent,
+        ip,
+        refreshToken: hashedToken,
+        expiresAt: { $gt: new Date() }
+    })
+    .select('+refreshToken')
+    .lean()
+}
+
 const deleteSession = async (sessionId) => {
     if(!sessionId) throw new Error('sessionId is required.')
         
@@ -100,6 +116,7 @@ const deleteSession = async (sessionId) => {
 
 module.exports = { 
     createSession,
+    verifySession,
     deleteSession,
     // updateSession,
     // revokeActiveSession,

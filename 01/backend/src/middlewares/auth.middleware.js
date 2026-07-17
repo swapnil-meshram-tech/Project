@@ -1,10 +1,9 @@
 const config = require('../configs/env')
 const { REFRESH_COOKIE_OPTIONS } = require('../configs/cookie.config.js')
-const Session = require('../models/session.model')
-const { hashToken } = require('../utils/crypto.utils')
-const { verifyTokenBlacklisted } = require('../utils/blacklist.utils')
-const { verifyJwtToken } = require('../utils/jwt.utils')
 const { verifyUserById } = require('../repositories/user.repository')
+const { verifySession } = require('../services/session.service.js')
+const { verifyJwtToken } = require('../utils/jwt.utils')
+const { verifyTokenBlacklisted } = require('../utils/blacklist.utils')
 const { AppError } = require('../utils/apperror.utils.js')
 
 const verifyAccessToken = async (req, res, next) => {
@@ -104,35 +103,26 @@ const verifyActiveSession = async (req, res, next) => {
     try {
         const userId = req.user?.id
         const userAgent = req.headers['user-agent'] || 'unknown'
-        
+        const ip = req.ip || req.headers['x-forwarded-for']?.split(',')[0].trim() || req.socket?.remoteAddress || 'unknown'
         const refreshToken = req.cookies?.refreshToken
-
-        const hashedToken = hashToken(refreshToken)
 
         const [user, validSession] = await Promise.all([
             verifyUserById(userId),
-            
-            Session.findOne({
-                userId,
-                userAgent,
-                refreshToken: hashedToken,
-                // isRevoked: false,
-                expiresAt: { $gt: new Date() }
-            })
-            .select('+refreshToken')
-            .lean(),
+
+            verifySession(userId, userAgent, ip, refreshToken)
         ])
 
         if (!user || user.isActive === false) {
-            console.error('User is not found / User is inactive:',userId)
+            // console.error('User is not found / User is inactive:',userId)
             
             throw new AppError('Invalid or expired session.', 401)
         }
 
+        console.log('\n', user)
         console.log('\n', validSession)
 
         if (!validSession) {
-            console.error('Invalid or expired session for userId:',userId)
+            // console.error('Invalid or expired session for userId:',userId)
             
             throw new AppError('Invalid or expired session.', 401)
         }

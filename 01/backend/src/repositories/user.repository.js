@@ -36,7 +36,7 @@ const createUser = async(username, email, password) =>{
 }
 
 const verifyUserById = async(userId) =>{
-    if(!userId) throw new Error('verifyUserById: userId is required.')
+    if(!userId) throw new Error('userId is required.')
 
     return User.findById(userId)
     .select('role isActive')
