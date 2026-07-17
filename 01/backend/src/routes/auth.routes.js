@@ -10,7 +10,7 @@ const authRouter = Router()
 authRouter.post('/register', register)
 authRouter.post('/login', login)
 
-authRouter.post('/logout', verifyAccessToken, verifyActiveUser, logout)
+authRouter.post('/logout', verifyAccessToken, logout)
 // authRouter.post('/logout-all', verifyAccessToken, verifyActiveSession, logoutAll)
 
 authRouter.post('/refresh-token', verifyRefreshToken, verifyActiveSession, refreshToken)

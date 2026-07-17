@@ -3,7 +3,7 @@ const Session = require('../models/session.model')
 const { REFRESH_COOKIE_OPTIONS, REFRESH_COOKIE_MAX_AGE } = require('../configs/cookie.config.js')
 const { verifyUserExistence, verifyUserCredentials, createUser } = require('../repositories/user.repository')
 const { generateAccessToken, generateRefreshToken } = require('../utils/jwt.utils')
-const { createSession, revokeActiveSession, revokeAllSession } = require('../services/session.service')
+const { createSession,deleteSession, revokeActiveSession, revokeAllSession } = require('../services/session.service')
 const { tokenBlacklisting } = require('../utils/blacklist.utils')
 const { AppError } = require('../utils/apperror.utils.js')
 
@@ -85,7 +85,7 @@ const login = async (req, res, next) =>{
         const user = await verifyUserCredentials(identifier)
 
         if (!user) {
-             throw new AppError('Invalid credentials.', 401) // stay vague — don't confirm non-existent accounts
+             throw new AppError('Invalid credentials.', 401) 
         }
 
         if (user.isActive === false) {
@@ -138,23 +138,28 @@ const logout = async (req, res, next) => {
         const { jti, exp, sessionId } = req.tokenData
         
         if (!jti || !exp || !sessionId) {
-            console.error('Logout error: Received incomplete data:', { jti, exp, sessionId })
+            // console.error('Logout error: Received incomplete data:', { jti, exp, sessionId })
             
             throw new AppError('Invalid or expired session.', 401)
         }
 
-        const result = await Promise.all([
+        const [blacklistResult, deletedSession] = await Promise.all([
             tokenBlacklisting(jti, exp, 'access'),
-            revokeActiveSession(sessionId),
+            deleteSession(sessionId),
+            // revokeActiveSession(sessionId),
         ])
-        console.log(result) 
+
+        if (!deletedSession) {            
+            throw new AppError('Session not found or user already logged out.', 404)
+        }
 
         res.clearCookie('refreshToken', REFRESH_COOKIE_OPTIONS)
 
         return res.status(200).json({
             success: true,
             message: 'Logged out successfully.',
-            result
+            blacklistResult, 
+            deletedSession
         })
         
     } catch(err){

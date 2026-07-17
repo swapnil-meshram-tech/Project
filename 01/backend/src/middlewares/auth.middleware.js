@@ -20,24 +20,24 @@ const verifyAccessToken = async (req, res, next) => {
         const accessToken = authHeader.split(' ')[1]
 
         if (!accessToken) {  
+            // console.error('Access token not found in Authorization header, accessToken)
+            
             throw new AppError('Invalid or expired token.', 401)
         }
 
         const decoded = verifyJwtToken(accessToken, config.JWT_ACCESS_SECRET)
 
-        // console.log(decoded)
-
-        if (!decoded?.jti || !decoded?.sessionId) {
-            console.error('Token has no jti or sessionId claim.')
+        if (!decoded?.id || !decoded?.role || !decoded?.jti || !decoded?.sessionId) {
+            // console.error('Token has no claim.')
 
             throw new AppError('Invalid or expired token.', 401)
         }
         
         const isBlacklisted = await verifyTokenBlacklisted(decoded.jti, 'access')
                 
-        if(isBlacklisted){
-            throw new AppError('Invalid or expired token.', 401)
-        }
+        // if(isBlacklisted){
+        //     throw new AppError('Invalid or expired token.', 401)
+        // }
 
         req.user = {
             id: decoded.id,
@@ -53,8 +53,24 @@ const verifyAccessToken = async (req, res, next) => {
         next()
 
     } catch(err){
-        console.error('Access token verification error:',err.message)
+        // console.error('Access token verification error:',err.message)
 
+        next(err)
+    }
+}
+
+const verifyActiveUser = async (req, res, next) => {
+    try {
+        const user = await verifyUserById(req.user?.id)
+
+        if (!user || user.isActive === false) {
+            throw new AppError('Account inactive.', 401)
+        }
+
+        next()
+
+    } catch (err) {
+        console.error('User active check error:', err.message)
         next(err)
     }
 }
@@ -96,22 +112,6 @@ const verifyRefreshToken = async (req, res, next) => {
     } catch(err){
         console.error('Refresh token verification error:',err.message)
         
-        next(err)
-    }
-}
-
-const verifyActiveUser = async (req, res, next) => {
-    try {
-        const user = await verifyUserById(req.user?.id)
-
-        if (!user || user.isActive === false) {
-            throw new AppError('Account inactive.', 401)
-        }
-
-        next()
-
-    } catch (err) {
-        console.error('User active check error:', err.message)
         next(err)
     }
 }

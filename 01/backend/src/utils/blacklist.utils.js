@@ -1,9 +1,9 @@
 const { getRedis } = require('../configs/redis')
 
-const tokenBlacklisting = async (jti, exp, type = 'access') => {
+const tokenBlacklisting = async (jti, exp, type) => {
+    if (!jti || !exp || !type) throw new Error('All fields are required.')
+    
     try {
-        if (!jti || !exp) return
-
         const expiresIn = exp - Math.floor(Date.now() / 1000)
 
         if (expiresIn <= 0) return
@@ -15,7 +15,7 @@ const tokenBlacklisting = async (jti, exp, type = 'access') => {
                   expiresIn
         )
 
-        // console.log(`verify token is blacklisted: ${jti} and expires in ${expiresIn}s`)
+        console.log(`verify token is blacklisted: ${jti} and expires in ${expiresIn}s`)
 
     } catch (err) {
         console.error('Token blacklisting error:', err.message)
@@ -23,9 +23,9 @@ const tokenBlacklisting = async (jti, exp, type = 'access') => {
 }
 
 const verifyTokenBlacklisted = async (jti, type = 'access') => {
-    try { 
-        if (!jti) return false
+    if(!jti || !type) throw new Error('jti and type are required.')
 
+    try { 
         const result = await getRedis().get(`blacklist:${type}:${jti}`)  
         // console.log(`verify token is blacklisted: ${jti}, with result: ${result}`)
         

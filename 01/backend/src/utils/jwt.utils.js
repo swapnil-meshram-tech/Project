@@ -18,7 +18,7 @@ const generateAccessToken = (userId, role, sessionId) =>{
 }
 
 const generateRefreshToken = (userId) =>{
-   if(!userId) throw new Error('userId is required')
+   if(!userId) throw new Error('userId is required.')
 
    return jwt.sign({
            id: userId,
