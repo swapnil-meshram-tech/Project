@@ -43,7 +43,6 @@ const verifyUserById = async(userId) =>{
     .lean()
 }
 
-
 module.exports = {
     verifyUserExistence,
     verifyUserCredentials,

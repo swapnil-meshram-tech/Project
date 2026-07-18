@@ -31,7 +31,7 @@ const verifySession = async (userId, userAgent, ip, refreshToken) =>{
         refreshToken: hashedToken,
         expiresAt: { $gt: new Date() }
     })
-    .select('+refreshToken')
+    // .select('isRevoked')
     .lean()
 }
 
@@ -40,6 +40,22 @@ const deleteSession = async (sessionId) => {
         
     return Session.findByIdAndDelete(
         sessionId
+    )
+}
+
+const revokeAllSessions = async (userId) => {
+    if(!userId) throw new Error('userId is required.')
+
+    return Session.updateMany({ 
+        userId,  
+        isRevoked: false 
+        },
+        { $set: { 
+            refreshToken: null,
+            isRevoked: true, 
+            revokedAt: new Date() 
+          } 
+        }
     )
 }
 
@@ -98,26 +114,11 @@ const deleteSession = async (sessionId) => {
 // }
 
 
-// const revokeAllDeviceSessions = async (userId) => {
-//     if(!userId) return false
-
-//     return Session.updateMany({ 
-//         userId,  
-//         isRevoked: false 
-//         },
-//         { $set: { 
-//             refreshToken: null,
-//             isRevoked: true, 
-//             revokedAt: new Date() 
-//           } 
-//         }
-//     )
-// }
-
 module.exports = { 
     createSession,
     verifySession,
     deleteSession,
+    revokeAllSessions,
     // updateSession,
     // revokeActiveSession,
     // revokeAllDeviceSessions

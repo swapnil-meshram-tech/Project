@@ -1,7 +1,7 @@
 const config = require('../configs/env')
 const { REFRESH_COOKIE_OPTIONS } = require('../configs/cookie.config.js')
 const { verifyUserById } = require('../repositories/user.repository')
-const { verifySession } = require('../services/session.service.js')
+const { verifySession, revokeAllSessions } = require('../services/session.service.js')
 const { verifyJwtToken } = require('../utils/jwt.utils')
 const { verifyTokenBlacklisted } = require('../utils/blacklist.utils')
 const { AppError } = require('../utils/apperror.utils.js')
@@ -84,10 +84,10 @@ const verifyRefreshToken = async (req, res, next) => {
             id: decoded.id,
         }     
         
-        req.tokenData = {
-            jti: decoded.jti,
-            // exp: decoded.exp
-        }  
+        // req.tokenData = {
+        //     jti: decoded.jti,
+        //     // exp: decoded.exp
+        // }  
         
         console.log('debugging token:',refreshToken)
         next()
@@ -108,7 +108,6 @@ const verifyActiveSession = async (req, res, next) => {
 
         const [user, validSession] = await Promise.all([
             verifyUserById(userId),
-
             verifySession(userId, userAgent, ip, refreshToken)
         ])
 
@@ -130,24 +129,26 @@ const verifyActiveSession = async (req, res, next) => {
         if (validSession.isRevoked) {
             console.warn(`SECURITY BREACH: Token replay detected for User: ${userId} on Device: ${validSession.userAgent}`)
             
-            const result = await Session.updateMany({ 
-                    userId, 
-                    userAgent: validSession.userAgent,    // speciific not db
-                    isRevoked: false  
-                },{ 
-                    $set: { 
-                        refreshToken: null,
-                        isRevoked: true, 
-                        revokedAt: new Date() 
-                    } 
-                }
-            )
+            const result = await revokeAllSessions(user._id)
+
+            // const result = await Session.updateMany({ 
+            //         userId, 
+            //         userAgent: validSession.userAgent,    // specific not db
+            //         isRevoked: false  
+            //     },{ 
+            //         $set: { 
+            //             refreshToken: null,
+            //             isRevoked: true, 
+            //             revokedAt: new Date() 
+            //         } 
+            //     }
+            // )
 
             // console.log('\n',result)
             
             res.clearCookie('refreshToken', REFRESH_COOKIE_OPTIONS)
             
-            throw new AppError('Invalid or expired session.', 401)
+            throw new AppError('Please login again.', 401)
         }
         
         req.user = { 
@@ -158,7 +159,7 @@ const verifyActiveSession = async (req, res, next) => {
         // console.log(req.user)  // check
         
         req.tokenData = {
-            ...(req.tokenData || {}),          
+            // ...(req.tokenData || {}),          
             sessionId: validSession._id  
         }
 
@@ -166,7 +167,7 @@ const verifyActiveSession = async (req, res, next) => {
         
         next()
         
-    } catch (err) {
+    } catch(err) {
         console.error('Session verification error:', err.message)
         
         next(err)

@@ -169,7 +169,7 @@ const refreshToken = async (req, res, next) => {
     try {
         const userId = req.user?.id
         const role = req.user?.role
-        const sessionId = req.tokenData.sessionId
+        const sessionId = req.tokenData?.sessionId
         
         console.log('debugging:',sessionId)
         
@@ -178,21 +178,22 @@ const refreshToken = async (req, res, next) => {
         const ip = req.ip || req.headers['x-forwarded-for']?.split(',')[0].trim() || req.socket?.remoteAddress
         const userAgent = req.headers['user-agent'] || 'unknown'
         
-        const [, newSession] = await Promise.all([
-            revokeActiveSession(sessionId),                          
+        const [deletedSession, newSession] = await Promise.all([
+            // revokeActiveSession(sessionId),                          
+            deleteSession(sessionId),                          
             createSession(userId, userAgent, ip, newRefreshToken),  
         ])
+
+        if(!deletedSession){            
+            throw new AppError('Invalid or expired session.', 409)
+        }
         
-        if(!newSession){
-            console.error('Token rotation error: Unable to update refresh token in session.')
-            
+        if(!newSession){            
             throw new AppError('Invalid or expired session.', 409)
         }
         
         const newAccessToken = generateAccessToken(userId, role, newSession._id)
-       
-        console.log('debugging:',newSession)
-        
+               
         res.cookie('refreshToken', newRefreshToken, {
             ...REFRESH_COOKIE_OPTIONS,
             maxAge: REFRESH_COOKIE_MAX_AGE
@@ -214,10 +215,10 @@ const refreshToken = async (req, res, next) => {
 module.exports = {
     register,
     login,
-    // profile,
     logout,
-    // logoutAll,
     refreshToken
+    // profile,
+    // logoutAll,
 }
 
 
