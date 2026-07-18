@@ -1,6 +1,6 @@
 const { REFRESH_COOKIE_OPTIONS, REFRESH_COOKIE_MAX_AGE } = require('../configs/cookie.config.js')
 const { verifyUserExistence, verifyUserCredentials, createUser } = require('../repositories/user.repository')
-const { createSession,deleteSession, revokeActiveSession, revokeAllSession } = require('../services/session.service')
+const { createSession,deleteSession, revokeSession, revokeAllSession } = require('../repositories/session.repository.js')
 const { generateAccessToken, generateRefreshToken } = require('../utils/jwt.utils')
 const { tokenBlacklisting } = require('../utils/blacklist.utils')
 const { AppError } = require('../utils/apperror.utils.js')
@@ -171,7 +171,7 @@ const refreshToken = async (req, res, next) => {
         const role = req.user?.role
         const sessionId = req.tokenData?.sessionId
         
-        console.log('debugging:',sessionId)
+        // console.log('debugging:',sessionId)
         
         const newRefreshToken = generateRefreshToken(userId)
         
@@ -179,17 +179,17 @@ const refreshToken = async (req, res, next) => {
         const userAgent = req.headers['user-agent'] || 'unknown'
         
         const [deletedSession, newSession] = await Promise.all([
-            // revokeActiveSession(sessionId),                          
-            deleteSession(sessionId),                          
+            revokeSession(sessionId),                          
+            // deleteSession(sessionId),                          
             createSession(userId, userAgent, ip, newRefreshToken),  
         ])
 
-        if(!deletedSession){            
-            throw new AppError('Invalid or expired session.', 409)
-        }
+        // if(!deletedSession){            
+        //     throw new AppError('Invalid or expired session.', 409)
+        // }
         
         if(!newSession){            
-            throw new AppError('Invalid or expired session.', 409)
+            throw new Error('Invalid or expired session.')
         }
         
         const newAccessToken = generateAccessToken(userId, role, newSession._id)

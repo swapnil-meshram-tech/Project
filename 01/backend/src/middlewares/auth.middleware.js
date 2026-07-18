@@ -1,7 +1,7 @@
 const config = require('../configs/env')
 const { REFRESH_COOKIE_OPTIONS } = require('../configs/cookie.config.js')
 const { verifyUserById } = require('../repositories/user.repository')
-const { verifySession, revokeAllSessions } = require('../services/session.service.js')
+const { verifySession, revokeAllSessions } = require('../repositories/session.repository.js')
 const { verifyJwtToken } = require('../utils/jwt.utils')
 const { verifyTokenBlacklisted } = require('../utils/blacklist.utils')
 const { AppError } = require('../utils/apperror.utils.js')
@@ -89,11 +89,11 @@ const verifyRefreshToken = async (req, res, next) => {
         //     // exp: decoded.exp
         // }  
         
-        console.log('debugging token:',refreshToken)
+        // console.log('debugging token:',refreshToken)
         next()
 
     } catch(err){
-        console.error('Refresh token verification error:',err.message)
+        // console.error('Refresh token verification error:',err.message)
         
         next(err)
     }
@@ -117,8 +117,8 @@ const verifyActiveSession = async (req, res, next) => {
             throw new AppError('Invalid or expired session.', 401)
         }
 
-        console.log('\n', user)
-        console.log('\n', validSession)
+        // console.log('\n', user)
+        // console.log('\n', validSession)
 
         if (!validSession) {
             // console.error('Invalid or expired session for userId:',userId)
@@ -168,7 +168,7 @@ const verifyActiveSession = async (req, res, next) => {
         next()
         
     } catch(err) {
-        console.error('Session verification error:', err.message)
+        // console.error('Session verification error:', err.message)
         
         next(err)
     }
