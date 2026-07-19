@@ -162,7 +162,9 @@ const verifyActiveSession = async (req, res, next) => {
 
 const verifyActiveUser = async (req, res, next) => {
     try {
-        const user = await findUserById(req.user?.id)
+        const userId = req.user?.id
+        
+        const user = await findUserById(userId)
 
         if (!user || user.isActive === false) {
             throw new AppError('Account inactive.', 401)
