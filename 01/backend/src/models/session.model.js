@@ -50,6 +50,10 @@ sessionSchema.index(
     { refreshToken: 1 },
     { unique: true, partialFilterExpression: { refreshToken: { $type: 'string' } } }
 )
+sessionSchema.index(
+    { revokedAt: 1 },
+    { expireAfterSeconds: 86400, partialFilterExpression: { isRevoked: true } }
+)
 
 // const Session = mongoose.model('Session', sessionSchema)
 

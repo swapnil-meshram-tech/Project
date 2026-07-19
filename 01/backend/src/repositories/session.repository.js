@@ -46,15 +46,18 @@ const deleteSession = async (sessionId) => {
 const revokeSession = async (sessionId) => {
     if(!sessionId) throw new Error('sessionId is required.')
         
-    return Session.findByIdAndUpdate(
-            sessionId,
+    return Session.findOneAndUpdate(
+            { 
+                _id: sessionId, 
+                isRevoked: false 
+            },
             { $set: { 
                 isRevoked: true,
                 revokedAt: new Date()
             } 
         },
-        { new: true }
-        // { returnDocument: 'after' }
+        { returnDocument: 'after' }
+        // { new: true }
     )
     // .select('isRevoked')
     .lean()

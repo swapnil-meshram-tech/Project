@@ -178,18 +178,18 @@ const refreshToken = async (req, res, next) => {
         const ip = req.ip || req.headers['x-forwarded-for']?.split(',')[0].trim() || req.socket?.remoteAddress
         const userAgent = req.headers['user-agent'] || 'unknown'
         
-        const [deletedSession, newSession] = await Promise.all([
+        const [revokedSession, newSession] = await Promise.all([
             revokeSession(sessionId),                          
             // deleteSession(sessionId),                          
             createSession(userId, userAgent, ip, newRefreshToken),  
         ])
 
-        // if(!deletedSession){            
-        //     throw new AppError('Invalid or expired session.', 409)
-        // }
+        if(!revokedSession){            
+            throw new AppError('Invalid or expired session.', 409)
+        }
         
         if(!newSession){            
-            throw new Error('Invalid or expired session.')
+            throw new Error('Session creation failed..')
         }
         
         const newAccessToken = generateAccessToken(userId, role, newSession._id)
