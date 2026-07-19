@@ -30,7 +30,7 @@ const verifySession = async (userId, userAgent, refreshToken) =>{
         refreshToken: hashedToken,
         expiresAt: { $gt: new Date() }
     })
-    // .select('isRevoked')
+    .select('isRevoked userAgent')
     .lean()
 }
 

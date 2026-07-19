@@ -13,6 +13,16 @@ const verifyUserExistence = async(username, email) =>{
     .lean()
 }
 
+const createUser = async(username, email, password) =>{
+    if(!username || !email || !password) throw new Error('All fields are required.')
+
+    return User.create({
+        username,
+        email,
+        password,
+    })
+}
+
 const findUserByIdentifier = async(identifier) =>{
     if(!identifier) throw new Error('identifier is required.')
 
@@ -23,16 +33,6 @@ const findUserByIdentifier = async(identifier) =>{
         ]
     })
     .select('+password')
-}
-
-const createUser = async(username, email, password) =>{
-    if(!username || !email || !password) throw new Error('All fields are required.')
-
-    return User.create({
-        username,
-        email,
-        password,
-    })
 }
 
 const findUserById = async(userId) =>{

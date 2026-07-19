@@ -103,7 +103,6 @@ const verifyActiveSession = async (req, res, next) => {
     try {
         const userId = req.user?.id
         const userAgent = req.headers['user-agent'] || 'unknown'
-        const ip = req.ip || req.headers['x-forwarded-for']?.split(',')[0].trim() || req.socket?.remoteAddress || 'unknown'
         const refreshToken = req.cookies?.refreshToken
 
         const [user, validSession] = await Promise.all([
@@ -130,19 +129,6 @@ const verifyActiveSession = async (req, res, next) => {
             console.warn(`SECURITY BREACH: Token replay detected for User: ${userId} on Device: ${validSession.userAgent}`)
             
             const result = await revokeAllSessions(user._id)
-
-            // const result = await Session.updateMany({ 
-            //         userId, 
-            //         userAgent: validSession.userAgent,    // specific not db
-            //         isRevoked: false  
-            //     },{ 
-            //         $set: { 
-            //             refreshToken: null,
-            //             isRevoked: true, 
-            //             revokedAt: new Date() 
-            //         } 
-            //     }
-            // )
 
             // console.log('\n',result)
             
@@ -208,114 +194,3 @@ module.exports = {
     verifyActiveSession,
     authorize
 }
-
-// const verifyActiveUser = async (req, res, next) => {
-//     try {
-//         const userId = req.user?.id
-
-//         const user = await User.findById(userId).select('isActive').lean()
-
-//         if (!user || !user.isActive) {
-//             return res.status(401).json({
-//                 success: false,
-//                 message: 'Session invalid or expired.'
-//             })
-//         }
-
-//         next()
-
-//     } catch (err) {
-//         next(err)
-//     }
-// }
-
-// const verifyActiveSession = async (req, res, next) => {
-//     try {
-//         const userId = req.user?.id
-//         const userAgent = req.headers['user-agent'] || 'unknown'
-//         const refreshToken = req.cookies?.refreshToken
-
-//         const hashedToken = hashToken(refreshToken)
-
-//         const [user, session] = await Promise.all([
-//             User.findById(userId).select('role isActive').lean(),
-            
-//             Session.findOne({
-//                 userId,
-//                 userAgent,
-//                 isRevoked: false,
-//                 expiresAt: { $gt: new Date() }
-//             })
-//             .select('+refreshToken')
-//             .lean()
-//         ])
-
-//         if (!user || !user.isActive) {
-//             return res.status(401).json({
-//                 success: false,
-//                 message: 'User is inactive.'
-//             })
-//         }
-
-//         if (!session) {
-//             return res.status(401).json({
-//                 success: false,
-//                 message: 'Session invalid or expired.'
-//             })
-//         }
-
-//         if (session.refreshToken !== hashedToken) {
-            
-//             await Session.updateMany(
-//                 { userId },
-//                 { $set: { 
-//                     refreshToken: null, 
-//                     isRevoked: true, 
-//                     revokedAt: new Date() 
-//                 } }
-//             )
-
-//             res.clearCookie('refreshToken', { 
-//                 httpOnly: true, 
-//                 secure: false, 
-//                 sameSite: 'strict' 
-//             })
-
-//             return res.status(401).json({ 
-//                 success: false, 
-//                 message: 'Re-authentication required.' 
-//             })
-//         }
-
-//         req.user.role = user.role
-
-//         req.session = session
-
-//         next()
-
-//     } catch (err) {
-//         console.log('error:', err.message)
-//         next(err)
-//     }
-// }
-
-// const verifySessionRefreshToken = (req, res, next) => {
-   
-//     const refreshToken = req.cookies?.refreshToken
-//     const sessionRefreshToken = req.session?.refreshToken
-
-//     console.log('raw token:', refreshToken)
-//     console.log('hashed session token:', sessionRefreshToken)
-//     console.log('rehashed raw:', hashToken(refreshToken))
-
-//     const isTokenValid = compareTokens(refreshToken, sessionRefreshToken)
-
-//     if (!isTokenValid) {
-//         return res.status(401).json({
-//             success: false,
-//             message: 'Session invalid or expired.'
-//         })
-//     }
-
-//     next()
-// }

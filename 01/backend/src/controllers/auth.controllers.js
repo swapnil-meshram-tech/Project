@@ -148,7 +148,7 @@ const logout = async (req, res, next) => {
         ])
 
         if (!deletedSession) {            
-            throw new AppError('Session not found or user already logged out.', 404)
+            throw new AppError('Session not found or already logged out.', 404)
         }
 
         res.clearCookie('refreshToken', REFRESH_COOKIE_OPTIONS)
