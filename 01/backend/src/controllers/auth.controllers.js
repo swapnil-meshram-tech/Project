@@ -1,6 +1,6 @@
 const { REFRESH_COOKIE_OPTIONS, REFRESH_COOKIE_MAX_AGE } = require('../configs/cookie.config.js')
-const { verifyUserExistence, verifyUserCredentials, createUser } = require('../repositories/user.repository')
-const { createSession,deleteSession, revokeSession, revokeAllSession } = require('../repositories/session.repository.js')
+const { verifyUserExistence, findUserByIdentifier, createUser } = require('../repositories/user.repository')
+const { createSession,deleteSession, revokeSession, revokeAllSessions } = require('../repositories/session.repository.js')
 const { generateAccessToken, generateRefreshToken } = require('../utils/jwt.utils')
 const { tokenBlacklisting } = require('../utils/blacklist.utils')
 const { AppError } = require('../utils/apperror.utils.js')
@@ -80,7 +80,7 @@ const login = async (req, res, next) =>{
             throw new AppError('All fields are required.', 400)
         }
 
-        const user = await verifyUserCredentials(identifier)
+        const user = await findUserByIdentifier(identifier)
 
         if (!user) {
              throw new AppError('Invalid credentials.', 401) 

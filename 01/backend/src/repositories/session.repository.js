@@ -84,6 +84,4 @@ module.exports = {
     deleteSession,
     revokeSession,
     revokeAllSessions,
-    // updateSession,
-    // revokeAllDeviceSessions
 }

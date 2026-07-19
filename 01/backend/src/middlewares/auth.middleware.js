@@ -1,6 +1,6 @@
 const config = require('../configs/env')
 const { REFRESH_COOKIE_OPTIONS } = require('../configs/cookie.config.js')
-const { verifyUserById } = require('../repositories/user.repository')
+const { findUserById } = require('../repositories/user.repository')
 const { verifySession, revokeAllSessions } = require('../repositories/session.repository.js')
 const { verifyJwtToken } = require('../utils/jwt.utils')
 const { verifyTokenBlacklisted } = require('../utils/blacklist.utils')
@@ -107,7 +107,7 @@ const verifyActiveSession = async (req, res, next) => {
         const refreshToken = req.cookies?.refreshToken
 
         const [user, validSession] = await Promise.all([
-            verifyUserById(userId),
+            findUserById(userId),
             verifySession(userId, userAgent, refreshToken)
         ])
 
@@ -176,7 +176,7 @@ const verifyActiveSession = async (req, res, next) => {
 
 const verifyActiveUser = async (req, res, next) => {
     try {
-        const user = await verifyUserById(req.user?.id)
+        const user = await findUserById(req.user?.id)
 
         if (!user || user.isActive === false) {
             throw new AppError('Account inactive.', 401)

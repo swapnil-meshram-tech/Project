@@ -13,7 +13,7 @@ const verifyUserExistence = async(username, email) =>{
     .lean()
 }
 
-const verifyUserCredentials = async(identifier) =>{
+const findUserByIdentifier = async(identifier) =>{
     if(!identifier) throw new Error('identifier is required.')
 
     return User.findOne({
@@ -35,7 +35,7 @@ const createUser = async(username, email, password) =>{
     })
 }
 
-const verifyUserById = async(userId) =>{
+const findUserById = async(userId) =>{
     if(!userId) throw new Error('userId is required.')
 
     return User.findById(userId)
@@ -45,7 +45,7 @@ const verifyUserById = async(userId) =>{
 
 module.exports = {
     verifyUserExistence,
-    verifyUserCredentials,
+    findUserByIdentifier,
     createUser,
-    verifyUserById,
+    findUserById,
 }
