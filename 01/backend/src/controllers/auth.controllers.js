@@ -189,7 +189,7 @@ const refreshToken = async (req, res, next) => {
         }
         
         if(!newSession){            
-            throw new Error('Session creation failed..')
+            throw new Error('Session creation failed.')
         }
         
         const newAccessToken = generateAccessToken(userId, role, newSession._id)

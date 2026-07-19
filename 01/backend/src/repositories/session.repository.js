@@ -19,15 +19,14 @@ const createSession = async (userId, userAgent, ip, refreshToken) =>{
     })
 }
 
-const verifySession = async (userId, userAgent, ip, refreshToken) =>{
-    if(!userId || !userAgent || !ip || !refreshToken) throw new Error('All fields are required.')
+const verifySession = async (userId, userAgent, refreshToken) =>{
+    if(!userId || !userAgent || !refreshToken) throw new Error('All fields are required.')
 
     const hashedToken = hashToken(refreshToken)
 
     return Session.findOne({
         userId,
         userAgent,
-        ip,
         refreshToken: hashedToken,
         expiresAt: { $gt: new Date() }
     })

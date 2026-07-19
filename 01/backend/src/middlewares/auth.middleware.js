@@ -108,7 +108,7 @@ const verifyActiveSession = async (req, res, next) => {
 
         const [user, validSession] = await Promise.all([
             verifyUserById(userId),
-            verifySession(userId, userAgent, ip, refreshToken)
+            verifySession(userId, userAgent, refreshToken)
         ])
 
         if (!user || user.isActive === false) {
