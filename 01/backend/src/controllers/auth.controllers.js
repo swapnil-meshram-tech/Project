@@ -188,7 +188,7 @@ const logoutAll = async (req, res, next) => {
         ])        
 
         if (deletedSession.deletedCount === 0) {            
-            throw new AppError('Session not found or already logged out.', 404)
+            throw new AppError('No active sessions found.', 404)
         }
 
         res.clearCookie('refreshToken', REFRESH_COOKIE_OPTIONS)
