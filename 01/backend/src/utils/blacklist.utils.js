@@ -10,11 +10,13 @@ const tokenBlacklisting = async (jti, exp, type) => {
         if (expiresIn <= 0) return
 
         await getRedis().set(
-                  `blacklist:${type}:${jti}`,  
-                  'revoked',
-                  'EX',
-                  expiresIn
+            `blacklist:${type}:${jti}`,  
+            'revoked',
+            'EX',
+            expiresIn
         )
+
+        return 'blacklisted'
 
         // console.log(`Token: ${jti} is blacklisted and expires in ${expiresIn}s`)
 
@@ -24,12 +26,12 @@ const tokenBlacklisting = async (jti, exp, type) => {
 }
 
 const verifyTokenBlacklisted = async (jti, type) => {
-    if(!jti || !type) throw new Error('jti and type are required.')
+    if(!jti || !type) throw new Error('All fields are required.')
 
     try { 
         const result = await getRedis().get(`blacklist:${type}:${jti}`)  
         // console.log(`Verify token: ${jti} is blacklisted, with result: ${result}`)
-        
+
         return result === 'revoked'
 
     } catch(err) {

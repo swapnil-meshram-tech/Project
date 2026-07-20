@@ -3,7 +3,6 @@ const User = require('../models/user.model')
 const getProfile = async (req, res, next) => {
   try {
        const id = req.user.id
-       
    
       //  if(!id){
       //          return res.status(400).json({

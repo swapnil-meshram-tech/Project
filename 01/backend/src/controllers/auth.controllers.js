@@ -1,6 +1,6 @@
 const { REFRESH_COOKIE_OPTIONS, REFRESH_COOKIE_MAX_AGE } = require('../configs/cookie.config.js')
 const { verifyUserExistence, findUserByIdentifier, createUser } = require('../repositories/user.repository')
-const { createSession,deleteSession, revokeSession, revokeAllSessions } = require('../repositories/session.repository.js')
+const { createSession, deleteSession, deleteAllSessions, revokeSession, revokeAllSessions } = require('../repositories/session.repository.js')
 const { generateAccessToken, generateRefreshToken } = require('../utils/jwt.utils')
 const { tokenBlacklisting } = require('../utils/blacklist.utils')
 const { AppError } = require('../utils/apperror.utils.js')
@@ -156,7 +156,46 @@ const logout = async (req, res, next) => {
         return res.status(200).json({
             success: true,
             message: 'Logged out successfully.',
-            blacklistResult, 
+            deletedSession
+        })
+        
+    } catch(err){
+        next(err)
+    }
+}
+
+const logoutAll = async (req, res, next) => {
+    try {
+        const userId = req.user?.id
+        const { jti, exp, sessionId } = req.tokenData
+        
+        if (!userId) {
+            // console.error('Logout error.')
+            
+            throw new AppError('Invalid or expired session.', 401)
+        }
+
+        if (!jti || !exp || !sessionId) {
+            // console.error('Logout error: Received incomplete data:', { jti, exp, sessionId })
+            
+            throw new AppError('Invalid or expired session.', 401)
+        }
+
+        const [blacklistResult, deletedSession] = await Promise.all([
+            tokenBlacklisting(jti, exp, 'access'),
+            deleteAllSessions(userId),
+            // revokeSession(sessionId),
+        ])        
+
+        if (!deletedSession) {            
+            throw new AppError('Session not found or already logged out.', 404)
+        }
+
+        res.clearCookie('refreshToken', REFRESH_COOKIE_OPTIONS)
+
+        return res.status(200).json({
+            success: true,
+            message: 'Logged out all successfully.',
             deletedSession
         })
         
@@ -216,39 +255,12 @@ module.exports = {
     register,
     login,
     logout,
-    refreshToken
+    logoutAll,
+    refreshToken,
     // profile,
-    // logoutAll,
 }
 
 
-// const logoutAll = async (req, res, next) => {
-    //     try {
-        //         const userId = req.user.id
-        
-        //         const isRevoked = await revokeAllSession(userId)
-        
-        //         if (!isRevoked) {
-//             return res.status(409).json({
-    //                 success: false,
-    //                 message: 'Already logged out.'
-    //             })
-    //         }
-    
-//         res.clearCookie('refreshToken', {
-    //             httpOnly: true,
-    //             secure: false,
-    //             sameSite: 'strict'
-    //         })
-    
-    //         return res.status(200).json({
-//             success: true,
-//             message: 'Logged out of all devices.'
-//         })
 
-//     } catch(err){
-    //         next(err)
-    //     }
-    // }
     
     

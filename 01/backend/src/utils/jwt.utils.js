@@ -30,7 +30,7 @@ const generateRefreshToken = (userId) =>{
 }
 
 const verifyJwtToken = (token, secret) => {
-    if (!token || !secret) throw new Error('Token and secret are required.')
+    if (!token || !secret) throw new Error('All fields are required.')
 
     try {
         return jwt.verify(token, secret)

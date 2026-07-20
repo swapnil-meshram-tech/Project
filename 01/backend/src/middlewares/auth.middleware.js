@@ -26,7 +26,7 @@ const verifyAccessToken = async (req, res, next) => {
 
         const decoded = verifyJwtToken(accessToken, config.JWT_ACCESS_SECRET)
 
-        if (!decoded?.id || !decoded?.role || !decoded?.jti || !decoded?.sessionId) {
+        if (!decoded?.id || !decoded?.role || !decoded?.jti || !decoded?.exp || !decoded?.sessionId) {
             // console.error('Token has no claim.')
 
             throw new AppError('Invalid or expired token.', 401)
@@ -34,9 +34,9 @@ const verifyAccessToken = async (req, res, next) => {
         
         const isBlacklisted = await verifyTokenBlacklisted(decoded.jti, 'access')
                 
-        if(isBlacklisted){
-            throw new AppError('Invalid or expired token.', 401)
-        }
+        // if(isBlacklisted){
+        //     throw new AppError('Invalid or expired token.', 401)
+        // }
 
         req.user = {
             id: decoded.id,
@@ -163,7 +163,7 @@ const verifyActiveSession = async (req, res, next) => {
 const verifyActiveUser = async (req, res, next) => {
     try {
         const userId = req.user?.id
-        
+
         const user = await findUserById(userId)
 
         if (!user || user.isActive === false) {
