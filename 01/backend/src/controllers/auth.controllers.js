@@ -187,7 +187,7 @@ const logoutAll = async (req, res, next) => {
             // revokeSession(sessionId),
         ])        
 
-        if (!deletedSession) {            
+        if (deletedSession.deletedCount === 0) {            
             throw new AppError('Session not found or already logged out.', 404)
         }
 
