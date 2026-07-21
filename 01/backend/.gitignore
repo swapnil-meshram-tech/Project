@@ -6,6 +6,8 @@
 # ============================================
 # Environment Files (NEVER commit .env files with secrets)
 # ============================================
+.env
+.env.copy
 .env.development
 .env.staging
 .env.production
