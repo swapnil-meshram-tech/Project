@@ -1,8 +1,8 @@
 const { Router } = require('express')
-const { register, login, logout, logoutAll, refreshToken } = require('../controllers/auth.controllers')
+// const { registerLimiter  } = require('../middlewares/ratelimiter.middleware')
 const { verifyAccessToken, verifyRefreshToken, verifyActiveUser, verifyActiveSession } = require('../middlewares/auth.middleware')
-const { registerLimiter  } = require('../middlewares/ratelimiter.middleware')
-// const { testing } = require('../controllers/test.controller')
+const { register, login, logout, logoutAll, refreshToken } = require('../controllers/auth.controllers')
+const { sendMessage, getChatHistory } = require('../controllers/chat.controllers')
 
 const authRouter = Router()
 
@@ -15,7 +15,10 @@ authRouter.post('/logout-all', verifyAccessToken, logoutAll)
 
 authRouter.post('/refresh-token', verifyRefreshToken, verifyActiveSession, refreshToken)
 
-authRouter.post('/testing',verifyRefreshToken, verifyActiveSession, refreshToken)
+authRouter.post('/chat',  sendMessage)
+authRouter.get('/chat/history', getChatHistory)
+
+// authRouter.post('/testing',verifyRefreshToken, verifyActiveSession, refreshToken)
 
 module.exports = authRouter
 

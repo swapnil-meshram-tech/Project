@@ -1,4 +1,3 @@
-// const crypto = require('crypto')
 const mongoose = require('mongoose')
 
 const sessionSchema = new mongoose.Schema(
@@ -6,7 +5,7 @@ const sessionSchema = new mongoose.Schema(
         userId: {
             type: mongoose.Schema.Types.ObjectId,
             ref: 'User',
-            required: [true, 'User ID relationship is required'],
+            required: [true, 'User ID is required'],
         },
         ip: {
             type: String,

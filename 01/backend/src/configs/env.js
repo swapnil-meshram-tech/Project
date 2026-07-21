@@ -1,7 +1,7 @@
 const dotenv = require('dotenv')
 dotenv.config()
 
-const envVars = ['PORT', 'MONGODB_URI', 'DB_NAME', 'REDIS_HOST', 'REDIS_PORT', 'REDIS_PASSWORD', 'CORS_ORIGIN_1', 'CORS_ORIGIN_2', 'JWT_ACCESS_SECRET', 'JWT_REFRESH_SECRET', 'LOG_LEVEL', 'INSTANCES']
+const envVars = ['PORT', 'MONGODB_URI', 'DB_NAME', 'REDIS_HOST', 'REDIS_PORT', 'REDIS_PASSWORD', 'CORS_ORIGIN_1', 'CORS_ORIGIN_2', 'JWT_ACCESS_SECRET', 'JWT_REFRESH_SECRET', 'GEMINI_API_KEY']
 
 envVars.forEach((envVar) =>{
     const value = process.env[envVar]
@@ -21,8 +21,7 @@ const config = {
     CORS_ORIGIN_2: process.env.CORS_ORIGIN2,
     JWT_ACCESS_SECRET: process.env.JWT_ACCESS_SECRET,
     JWT_REFRESH_SECRET: process.env.JWT_REFRESH_SECRET,
-    LOG_LEVEL: process.env.LOG_LEVEL,
-    INSTANCES: process.env.INSTANCES,
+    GEMINI_API_KEY: process.env.GEMINI_API_KEY,
 }
 
 module.exports = config

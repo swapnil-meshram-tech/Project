@@ -1,37 +1,37 @@
-const User = require('../models/user.model')
+// const User = require('../models/user.model')
 
-const getProfile = async (req, res, next) => {
-  try {
-       const id = req.user.id
+// const getProfile = async (req, res, next) => {
+//   try {
+//        const id = req.user.id
    
-      //  if(!id){
-      //          return res.status(400).json({
-      //              success: false,
-      //              message: 'Id is required.'
-      //          })
-      //      }
+//       //  if(!id){
+//       //          return res.status(400).json({
+//       //              success: false,
+//       //              message: 'Id is required.'
+//       //          })
+//       //      }
    
-       const user = await User.findById(id).select('-password -refreshToken')
+//        const user = await User.findById(id).select('-password -refreshToken')
    
-       if (!user) {
-         return res.status(404).json({
-           success: false,
-           message: 'User not found'
-         })
-       }
+//        if (!user) {
+//          return res.status(404).json({
+//            success: false,
+//            message: 'User not found'
+//          })
+//        }
 
-       return res.status(200).json({
-         success: true,
-         message: 'Profile retrieved.',
-         data: user
-       })
+//        return res.status(200).json({
+//          success: true,
+//          message: 'Profile retrieved.',
+//          data: user
+//        })
 
-    } catch (err) {
-        next(err)
-    }   
-}
+//     } catch (err) {
+//         next(err)
+//     }   
+// }
 
 
-module.exports = {
-    getProfile
-}
+// module.exports = {
+//     getProfile
+// }

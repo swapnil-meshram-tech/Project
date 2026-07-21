@@ -58,11 +58,11 @@ const register = async (req, res, next) =>{
                 id: user._id,
                 username: user.username,
                 email: user.email,
-                role: user.role
+                // role: user.role
             },
             accessToken,
-            refreshToken,
-            newSession
+            // refreshToken,
+            // newSession
         })
 
     } catch(err){
@@ -119,11 +119,11 @@ const login = async (req, res, next) =>{
                 id: user._id,
                 username: user.username,
                 email: user.email,
-                role: user.role
+                // role: user.role
             },
             accessToken,
-            refreshToken,
-            newSession
+            // refreshToken,
+            // newSession
         })
 
     } catch(err){
@@ -156,7 +156,7 @@ const logout = async (req, res, next) => {
         return res.status(200).json({
             success: true,
             message: 'Logged out successfully.',
-            deletedSession
+            // deletedSession
         })
         
     } catch(err){
@@ -196,7 +196,7 @@ const logoutAll = async (req, res, next) => {
         return res.status(200).json({
             success: true,
             message: 'Logged out all successfully.',
-            deletedSession
+            // deletedSession
         })
         
     } catch(err){
@@ -242,8 +242,8 @@ const refreshToken = async (req, res, next) => {
             success: true,
             message: 'Token rotation successful.',
             accessToken: newAccessToken,
-            refreshToken: newRefreshToken,
-            newSession
+            // refreshToken: newRefreshToken,
+            // newSession
         })
         
     } catch (err) {
