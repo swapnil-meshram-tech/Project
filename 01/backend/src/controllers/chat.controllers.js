@@ -1,5 +1,5 @@
 const { createChat, findChatsByUserId } = require('../repositories/chat.repository')
-const { generateAIResponse } = require('../utils/gemini.utils')
+const { generateAIResponse } = require('../utils/ai.utils')
 const { AppError } = require('../utils/apperror.utils')
 
 const sendMessage = async (req, res, next) => {
@@ -13,8 +13,11 @@ const sendMessage = async (req, res, next) => {
 
         const aiResponse = await generateAIResponse(message)
 
+        console.log(message);
+        console.log(aiResponse);
         const newChat = await createChat(userId, message, aiResponse)
 
+        
         return res.status(200).json({
             success: true,
             message: 'Message processed successfully.',

@@ -15,8 +15,8 @@ authRouter.post('/logout-all', verifyAccessToken, logoutAll)
 
 authRouter.post('/refresh-token', verifyRefreshToken, verifyActiveSession, refreshToken)
 
-authRouter.post('/chat',  sendMessage)
-authRouter.get('/chat/history', getChatHistory)
+authRouter.post('/chat', verifyAccessToken, sendMessage)
+authRouter.get('/chat/history', verifyAccessToken, getChatHistory)
 
 // authRouter.post('/testing',verifyRefreshToken, verifyActiveSession, refreshToken)
 
