@@ -12,7 +12,8 @@ const generateAIResponse = async (messages) => {
     const completion = await ai.chat.completions.create({
         model: config.AI_MODEL,
         messages,
-        timeout: 5000 
+        max_tokens: 500, 
+        timeout: 15000 
     })
 
     return completion.choices[0].message.content

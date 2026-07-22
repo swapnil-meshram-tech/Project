@@ -1,0 +1,36 @@
+Phase 1: Solidify GenAI Integration (you're ~80% here already)
+Step 1.1 — Basic chat endpoint (done)
+Step 1.2 — Add conversation memory (context)
+Right now, each message is independent — the AI doesn't remember previous messages in the same chat. Learn to pass conversation history as an array:
+javascriptmessages: [
+    { role: 'user', content: 'My name is Swapnil' },
+    { role: 'assistant', content: 'Nice to meet you, Swapnil!' },
+    { role: 'user', content: 'What is my name?' }   // now it can answer correctly
+]
+Guidance: fetch the last N messages from MongoDB for that user, format them into this array, send with each new request.
+Step 1.3 — Streaming responses
+Learn to stream tokens back as they're generated (like ChatGPT's typing effect), instead of waiting for the full response. Look into stream: true in the OpenAI SDK + Server-Sent Events (SSE) in Express.
+Step 1.4 — Rate limiting
+Use your existing Redis to limit how many messages a user can send per minute — protects your API costs.
+
+Phase 2: RAG Fundamentals (the big next skill)
+Step 2.1 — Understand the core concept first (no code yet)
+Read/watch a few explainers on: what is an "embedding," what is a "vector database," why do we "chunk" documents. Spend a day just understanding the concept before coding — RAG breaks quickly if you don't understand why each step exists.
+Step 2.2 — Text chunking
+Learn to split a long document into smaller pieces (e.g., 500-word chunks with slight overlap). Library: langchain has text splitters, or you can write simple chunking logic yourself first to understand it.
+Step 2.3 — Generate embeddings
+Learn to convert text chunks into embeddings (numerical vectors representing meaning) using an embedding API (OpenAI's text-embedding-3-small, or free alternatives via OpenRouter/Gemini).
+Step 2.4 — Store in a vector database
+Learn one: ChromaDB (free, runs locally, great for learning) or Pinecone (cloud-based, has free tier). Store your document chunks + their embeddings here.
+Step 2.5 — Retrieval
+Learn to: take a user's question → convert it to an embedding too → search the vector DB for the most similar chunks → pull those chunks back.
+Step 2.6 — Augmented generation
+Take those retrieved chunks + the user's original question → send both to the LLM → "Answer this question using ONLY the following context: [chunks]." This is the actual "RAG" step — retrieval + generation combined.
+Step 2.7 — Build the full pipeline
+Put it together: user uploads a PDF → chunk it → embed it → store it → user asks a question → retrieve relevant chunks → generate an answer using them.
+
+Phase 3: Agentic AI (learn conceptually, build small example)
+Step 3.1 — Understand "tool calling"
+Learn how LLMs can be given a list of "tools" (functions) they can choose to call, e.g., "search_database," "get_weather" — and the model decides when to use them.
+Step 3.2 — Build one simple agentic feature
+Example: extend your chatbot so it can decide to search the user's own chat history when asked "what did I ask you yesterday?" — giving the AI a tool to query MongoDB, and letting it decide when to use it.

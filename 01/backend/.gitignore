@@ -2,6 +2,10 @@
 # .gitignore
 # Prevent committing sensitive files to git
 # ============================================
+Project/01/AI.TEXT
+Project/01/TEXT.TEXT
+01/AI.TEXT
+01text.txt
 
 # ============================================
 # Environment Files (NEVER commit .env files with secrets)
