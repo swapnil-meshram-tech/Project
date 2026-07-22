@@ -1,7 +1,7 @@
 const dotenv = require('dotenv')
 dotenv.config()
 
-const envVars = ['PORT', 'MONGODB_URI', 'DB_NAME', 'REDIS_HOST', 'REDIS_PORT', 'REDIS_PASSWORD', 'CORS_ORIGIN_1', 'CORS_ORIGIN_2', 'JWT_ACCESS_SECRET', 'JWT_REFRESH_SECRET', 'AI_API_KEY']
+const envVars = ['PORT', 'MONGODB_URI', 'DB_NAME', 'REDIS_HOST', 'REDIS_PORT', 'REDIS_PASSWORD', 'CORS_ORIGIN_1', 'CORS_ORIGIN_2', 'JWT_ACCESS_SECRET', 'JWT_REFRESH_SECRET', 'AI_API_KEY', 'AI_BASE_URL', 'AI_MODEL']
 
 envVars.forEach((envVar) =>{
     const value = process.env[envVar]
@@ -22,6 +22,8 @@ const config = {
     JWT_ACCESS_SECRET: process.env.JWT_ACCESS_SECRET,
     JWT_REFRESH_SECRET: process.env.JWT_REFRESH_SECRET,
     AI_API_KEY: process.env.AI_API_KEY,
+    AI_BASE_URL: process.env.AI_BASE_URL,
+    AI_MODEL: process.env.AI_MODEL,
 }
 
 module.exports = config

@@ -1,4 +1,4 @@
-const { createChat, findChatsByUserId } = require('../repositories/chat.repository')
+const { createChat, findAllChats, findRecentChats} = require('../repositories/chat.repository')
 const { generateAIResponse } = require('../utils/ai.utils')
 const { AppError } = require('../utils/apperror.utils')
 
@@ -11,13 +11,22 @@ const sendMessage = async (req, res, next) => {
             throw new AppError('Message is required.', 400)
         }
 
-        const aiResponse = await generateAIResponse(message)
+        const recentChats = await findRecentChats(userId, 10)
 
-        console.log(message);
-        console.log(aiResponse);
+        const orderedChats = recentChats.reverse()
+        
+        const history = orderedChats.flatMap(chat => [
+            { role: 'user', content: chat.message },
+            { role: 'assistant', content: chat.response }
+        ])
+
+        const messages = [...history, { role: 'user', content: message }]
+        
+        console.log(messages)
+        const aiResponse = await generateAIResponse(messages)
+
         const newChat = await createChat(userId, message, aiResponse)
 
-        
         return res.status(200).json({
             success: true,
             message: 'Message processed successfully.',
@@ -36,7 +45,7 @@ const getChatHistory = async (req, res, next) => {
     try {
         const userId = req.user?.id
 
-        const history = await findChatsByUserId(userId)
+        const history = await findAllChats(userId)
 
         return res.status(200).json({
             success: true,

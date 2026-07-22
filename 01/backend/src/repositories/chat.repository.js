@@ -10,7 +10,7 @@ const createChat = async (userId, message, response) => {
     })
 }
 
-const findChatsByUserId = async (userId) => {
+const findAllChats = async (userId) => {
     if (!userId) throw new Error('userId is required.')
 
     return Chat.find({ userId })
@@ -18,8 +18,18 @@ const findChatsByUserId = async (userId) => {
     .lean()
 }
 
+const findRecentChats = async (userId, N) => {
+    if (!userId) throw new Error('userId is required.')
+
+    return Chat.find({ userId })
+    .sort({ createdAt: -1 })
+    .limit(N)
+    .lean()
+}
+
 module.exports = {
     createChat, 
-    findChatsByUserId,
+    findAllChats,
+    findRecentChats,
 }
 
