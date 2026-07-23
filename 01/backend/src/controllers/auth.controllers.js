@@ -180,13 +180,15 @@ const logoutAll = async (req, res, next) => {
             throw new AppError('Invalid or expired session.', 401)
         }
 
-        await tokenBlacklisting(jti, exp, 'access')
+        const blacklistResult = await tokenBlacklisting(jti, exp, 'access')
+
+        const activeSessions = await findActiveSessionIds(userId)
         
-        const [blacklistResult, sessionResult] = await Promise.all([
-            tokenBlacklisting(sessionId.toString(), exp, 'session'),
-            revokeAllSessions(userId),
-            // deleteAllSessions(userId),
-        ])        
+        if (!activeSessions || activeSessions.length === 0 ) {            
+            throw new AppError('No active sessions found.', 404)
+        }
+
+        const sessionResult = await revokeSession(sessionId),
 
         if (sessionResult.deletedCount === 0 || sessionResult.modifiedCount === 0) {            
             throw new AppError('No active sessions found.', 404)
