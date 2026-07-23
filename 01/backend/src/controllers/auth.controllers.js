@@ -167,16 +167,9 @@ const logoutAll = async (req, res, next) => {
     try {
         const userId = req.user?.id
         const { jti, exp, sessionId } = req.tokenData
-        
-        if (!userId) {
-            // console.error('Logout error.')
-            
-            throw new AppError('Invalid or expired session.', 401)
-        }
 
-        if (!jti || !exp || !sessionId) {
+        if (!userId || !jti || !exp || !sessionId) {
             // console.error('Logout error: Received incomplete data:', { jti, exp, sessionId })
-            
             throw new AppError('Invalid or expired session.', 401)
         }
 
@@ -188,7 +181,7 @@ const logoutAll = async (req, res, next) => {
             throw new AppError('No active sessions found.', 404)
         }
 
-        const sessionResult = await revokeSession(sessionId),
+        const sessionResult = await revokeSession(sessionId)
 
         if (sessionResult.deletedCount === 0 || sessionResult.modifiedCount === 0) {            
             throw new AppError('No active sessions found.', 404)
