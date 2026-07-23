@@ -4,7 +4,7 @@ const { getProfile } = require('../controllers/user.controllers')
 
 const userRouter = Router()
 
-// userRouter.use(verifyAccessToken)
+userRouter.use(verifyAccessToken)
 
 userRouter.get('/profile', getProfile)
 

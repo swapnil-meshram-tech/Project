@@ -1,6 +1,6 @@
 const { REFRESH_COOKIE_OPTIONS, REFRESH_COOKIE_MAX_AGE } = require('../configs/cookie.config.js')
 const { verifyUserExistence, findUserByIdentifier, createUser } = require('../repositories/user.repository')
-const { createSession, deleteSession, deleteAllSessions, revokeSession, revokeAllSessions } = require('../repositories/session.repository.js')
+const { createSession, findActiveSessionIds, deleteSession, deleteAllSessions, revokeSession, revokeAllSessions } = require('../repositories/session.repository.js')
 const { generateAccessToken, generateRefreshToken } = require('../utils/jwt.utils')
 const { tokenBlacklisting } = require('../utils/blacklist.utils')
 const { AppError } = require('../utils/apperror.utils.js')
@@ -136,8 +136,7 @@ const logout = async (req, res, next) => {
         const { jti, exp, sessionId } = req.tokenData
         
         if (!jti || !exp || !sessionId) {
-            // console.error('Logout error: Received incomplete data:', { jti, exp, sessionId })
-            
+            // console.error('Logout error: Received incomplete data:', { jti, exp, sessionId }) 
             throw new AppError('Invalid or expired session.', 401)
         }
 
@@ -181,8 +180,10 @@ const logoutAll = async (req, res, next) => {
             throw new AppError('Invalid or expired session.', 401)
         }
 
+        await tokenBlacklisting(jti, exp, 'access')
+        
         const [blacklistResult, sessionResult] = await Promise.all([
-            tokenBlacklisting(jti, exp, 'access'),
+            tokenBlacklisting(sessionId.toString(), exp, 'session'),
             revokeAllSessions(userId),
             // deleteAllSessions(userId),
         ])        

@@ -34,6 +34,17 @@ const verifySession = async (userId, userAgent, refreshToken) =>{
     .lean()
 }
 
+const findActiveSessionIds = async (userId) =>{
+    if(!userId) throw new Error('userId is required.')
+
+    return Session.find({ 
+        userId,
+        isRevoked: false
+    })
+    .select('_id')
+    .lean()
+}
+
 const deleteSession = async (sessionId) => {
     if(!sessionId) throw new Error('sessionId is required.')
         
@@ -86,6 +97,7 @@ const revokeAllSessions = async (userId) => {
 module.exports = { 
     createSession,
     verifySession,
+    findActiveSessionIds,
     deleteSession,
     deleteAllSessions,
     revokeSession,

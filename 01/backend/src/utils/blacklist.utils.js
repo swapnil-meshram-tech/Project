@@ -7,7 +7,7 @@ const tokenBlacklisting = async (jti, exp, type) => {
     try {
         const expiresIn = exp - Math.floor(Date.now() / 1000)
 
-        if (expiresIn <= 0) return
+        if (expiresIn <= 0) return 'expired'
 
         await getRedis().set(
             `blacklist:${type}:${jti}`,  
@@ -15,10 +15,9 @@ const tokenBlacklisting = async (jti, exp, type) => {
             'EX',
             expiresIn
         )
-
-        return 'blacklisted'
-
         // console.log(`Token: ${jti} is blacklisted and expires in ${expiresIn}s`)
+        
+        return 'blacklisted'
 
     } catch (err) {
         console.error('Token blacklisting error:', err.message)

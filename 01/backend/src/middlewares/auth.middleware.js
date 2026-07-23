@@ -32,9 +32,11 @@ const verifyAccessToken = async (req, res, next) => {
             throw new AppError('Invalid or expired token.', 401)
         }
         
-        const isBlacklisted = await verifyTokenBlacklisted(decoded.jti, 'access')
+        const isTokenBlacklisted = await verifyTokenBlacklisted(decoded.jti, 'access')
+
+        const isSessionBlacklisted = await verifyTokenBlacklisted(decoded.sessionId, 'session')
                 
-        // if(isBlacklisted){
+        // if(isTokenBlacklisted || isSessionBlacklisted){
         //     throw new AppError('Invalid or expired token.', 401)
         // }
 
