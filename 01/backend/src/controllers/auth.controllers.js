@@ -141,13 +141,13 @@ const logout = async (req, res, next) => {
             throw new AppError('Invalid or expired session.', 401)
         }
 
-        const [blacklistResult, deletedSession] = await Promise.all([
+        const [blacklistResult, sessionResult] = await Promise.all([
             tokenBlacklisting(jti, exp, 'access'),
-            deleteSession(sessionId),
-            // revokeActiveSession(sessionId),
-        ])
+            revokeSession(sessionId),
+            // deleteSession(sessionId),
+        ])        
 
-        if (!deletedSession) {            
+        if (!sessionResult) {            
             throw new AppError('Session not found or already logged out.', 404)
         }
 
@@ -156,7 +156,7 @@ const logout = async (req, res, next) => {
         return res.status(200).json({
             success: true,
             message: 'Logged out successfully.',
-            // deletedSession
+            // sessionResult
         })
         
     } catch(err){
@@ -181,13 +181,13 @@ const logoutAll = async (req, res, next) => {
             throw new AppError('Invalid or expired session.', 401)
         }
 
-        const [blacklistResult, deletedSession] = await Promise.all([
+        const [blacklistResult, sessionResult] = await Promise.all([
             tokenBlacklisting(jti, exp, 'access'),
-            deleteAllSessions(userId),
-            // revokeSession(sessionId),
+            revokeAllSessions(userId),
+            // deleteAllSessions(userId),
         ])        
 
-        if (deletedSession.deletedCount === 0) {            
+        if (sessionResult.deletedCount === 0 || sessionResult.modifiedCount === 0) {            
             throw new AppError('No active sessions found.', 404)
         }
 
@@ -195,8 +195,8 @@ const logoutAll = async (req, res, next) => {
 
         return res.status(200).json({
             success: true,
-            message: 'Logged out all successfully.',
-            // deletedSession
+            message: 'All session logged out successfully.',
+            // sessionResult
         })
         
     } catch(err){
@@ -209,17 +209,14 @@ const refreshToken = async (req, res, next) => {
         const userId = req.user?.id
         const role = req.user?.role
         const sessionId = req.tokenData?.sessionId
-        
-        // console.log('debugging:',sessionId)
-        
-        const newRefreshToken = generateRefreshToken(userId)
-        
+            
         const ip = req.ip || req.headers['x-forwarded-for']?.split(',')[0].trim() || req.socket?.remoteAddress
         const userAgent = req.headers['user-agent'] || 'unknown'
         
+        const newRefreshToken = generateRefreshToken(userId)
+        
         const [revokedSession, newSession] = await Promise.all([
             revokeSession(sessionId),                          
-            // deleteSession(sessionId),                          
             createSession(userId, userAgent, ip, newRefreshToken),  
         ])
 
@@ -242,8 +239,8 @@ const refreshToken = async (req, res, next) => {
             success: true,
             message: 'Token rotation successful.',
             accessToken: newAccessToken,
-            // refreshToken: newRefreshToken,
-            // newSession
+            refreshToken: newRefreshToken,
+            newSession
         })
         
     } catch (err) {

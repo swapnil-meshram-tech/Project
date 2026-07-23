@@ -63,7 +63,7 @@ const revokeSession = async (sessionId) => {
         { returnDocument: 'after' }
         // { new: true }
     )
-    .select('isRevoked')
+    .select('userId isRevoked')
     .lean()
 }
 

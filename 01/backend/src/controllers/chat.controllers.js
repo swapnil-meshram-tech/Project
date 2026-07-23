@@ -17,7 +17,7 @@ const sendMessage = async (req, res, next) => {
         
         const history = orderedChats.flatMap(chat => [
             { role: 'user', content: chat.message },
-            { role: 'assistant', content: chat.response }
+            { role: 'system', content: chat.response }
         ])
 
         const messages = [...history, { role: 'user', content: message }]
