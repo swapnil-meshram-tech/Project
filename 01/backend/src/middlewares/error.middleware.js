@@ -6,6 +6,14 @@ const notFoundErrorHandler = (req, res, next) =>{
 }
 
 const globalErrorHandler = (err, req, res, next) =>{
+    
+    if (err instanceof SyntaxError && err.status === 400 && 'body' in err) {
+        return res.status(400).json({
+            success: false,
+             message: "Invalid JSON format in request body." 
+        })
+    }
+
     const statusCode = err.statusCode || 500
     const location = err.stack.split('\n')[1]?.trim()
     const type = err.isOperational ? 'CLIENT ERROR' : 'SERVER ERROR'

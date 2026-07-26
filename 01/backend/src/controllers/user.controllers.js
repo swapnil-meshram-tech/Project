@@ -119,10 +119,8 @@ const updateEmail = async (req, res, next) =>{
 const updatePassword = async (req, res, next) =>{
     try{
         const userId = req.user?.id
-        const previousPassword = req.body?.oldPassword
-        const latestPassword = req.body?.newPassword
-        const confirmPassword = req.body?.confirmPassword
-        
+        const { oldPassword: previousPassword, newPassword: latestPassword, confirmPassword }  = req.body ?? {}
+
         if(!userId){
             // console.error('error: userId is required.')
             throw new AppError('Invalid or expired session.', 400)
@@ -135,7 +133,7 @@ const updatePassword = async (req, res, next) =>{
 
         if(previousPassword === latestPassword){
             // console.error('error: previousPassword and latestPassword could not be similar.')
-            throw new AppError('Old and new password could not be similar.', 400)
+            throw new AppError('New password cannot be the same as the old password.', 400)
         }
 
         if(latestPassword.length < 8){
@@ -145,7 +143,7 @@ const updatePassword = async (req, res, next) =>{
 
         if(latestPassword !== confirmPassword){
             // console.error('error: Passwords do not match.')
-            throw new AppError('Passwords do not match.', 400)
+            throw new AppError('New password and confirmation password do not match.', 400)
         }
         
         const changedPassword = await changePassword(userId, previousPassword, latestPassword)
