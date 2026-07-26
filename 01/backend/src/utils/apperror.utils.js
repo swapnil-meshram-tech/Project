@@ -1,10 +1,8 @@
 class AppError extends Error {
     constructor(message, statusCode) {
-        super()
-        this.message = message
+        super(message)
         this.statusCode = statusCode
-        this.isOperational = true   // marks this as an expected, deliberately-thrown error
-
+        this.isOperational = true   
         Error.captureStackTrace(this, this.constructor)
     }
 }

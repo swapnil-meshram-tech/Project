@@ -7,7 +7,8 @@ const { AppError } = require('../utils/apperror.utils.js')
 
 const register = async (req, res, next) =>{
     try{
-        const { username, email, password, confirmPassword } = req.body ?? {}
+        // const { username, email, password, confirmPassword } = req.body ?? {}
+        const { username, email, password, confirmPassword } = req.body
 
         if(!username || !email || !password || !confirmPassword){
             // console.error('Registeration error: All fields are required.')

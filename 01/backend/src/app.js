@@ -11,6 +11,7 @@ const authRouter = require('./routes/auth.routes')
 const adminRouter = require('./routes/admin.routes')
 const userRouter = require('./routes/user.routes')
 const { notFoundErrorHandler, globalErrorHandler } = require('./middlewares/error.middleware')
+const { rejectEmptyBody } = require('./middlewares/validation.middleware')
 
 const app = express()
 
@@ -35,6 +36,8 @@ app.use(express.json({ limit: '10kb' }))
 app.use(express.urlencoded({ limit: '10kb', extended: true }))
 
 app.use(cookieParser())
+
+app.use(rejectEmptyBody)
 
 // app.use(mongoSanitize({
 //   allowDots: false,        // strip keys with dots (default: false = strip them)

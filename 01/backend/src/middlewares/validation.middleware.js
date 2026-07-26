@@ -1,0 +1,17 @@
+const { AppError } = require('../utils/apperror.utils')
+
+const rejectEmptyBody = (req, res, next) =>{
+    const methods = ['POST', 'PUT', 'PATCH']
+
+    if (methods.includes(req.method) && (!req.body || Object.keys(req.body).length === 0)) {
+        const err = new AppError('Request body cannot be empty.', 400)
+        
+        return next(err)
+    }
+
+    next()
+}
+
+module.exports = {
+    rejectEmptyBody
+}
