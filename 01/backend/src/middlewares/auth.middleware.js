@@ -1,8 +1,8 @@
-const config = require('../configs/env')
+const config = require('../configs/env.js')
 const { REFRESH_COOKIE_OPTIONS } = require('../configs/cookie.config.js')
-const { findUserById } = require('../repositories/user.repository')
+const { findUserById } = require('../repositories/auth.repository.js')
 const { verifySession, revokeAllSessions } = require('../repositories/session.repository.js')
-const { verifyJwtToken } = require('../utils/jwt.utils')
+const { verifyJwtToken } = require('../utils/jwt.utils.js')
 const { verifyTokenBlacklisted } = require('../utils/blacklist.utils')
 const { AppError } = require('../utils/apperror.utils.js')
 
@@ -36,9 +36,15 @@ const verifyAccessToken = async (req, res, next) => {
 
         const isSessionBlacklisted = await verifyTokenBlacklisted(decoded.sessionId, 'session')
                 
-        // if(isTokenBlacklisted || isSessionBlacklisted){
-        //     throw new AppError('Invalid or expired token.', 401)
-        // }
+        if(isTokenBlacklisted){
+            throw new AppError('token Invalid or expired token.', 401)
+        }
+
+        console.log('isSessionBlacklisted',isSessionBlacklisted)
+
+        if(isSessionBlacklisted){
+            throw new AppError('session Invalid or expired token.', 401)
+        }
 
         req.user = {
             id: decoded.id,
@@ -55,7 +61,6 @@ const verifyAccessToken = async (req, res, next) => {
 
     } catch(err){
         // console.error('Access token verification error:',err.message)
-
         next(err)
     }
 }
@@ -131,7 +136,6 @@ const verifyActiveSession = async (req, res, next) => {
             console.warn(`SECURITY BREACH: Token replay detected for User: ${userId} on Device: ${validSession.userAgent}`)
             
             const result = await revokeAllSessions(user._id)
-
             // console.log('\n',result)
             
             res.clearCookie('refreshToken', REFRESH_COOKIE_OPTIONS)
@@ -143,21 +147,17 @@ const verifyActiveSession = async (req, res, next) => {
             ...req.user,        
             role: user.role 
         }
-        
         // console.log(req.user)  // check
         
         req.tokenData = {
             // ...(req.tokenData || {}),          
             sessionId: validSession._id  
         }
-
         // console.log(req.tokenData) // check
-        
         next()
         
     } catch(err) {
         // console.error('Session verification error:', err.message)
-        
         next(err)
     }
 }
@@ -175,7 +175,7 @@ const verifyActiveUser = async (req, res, next) => {
         next()
 
     } catch (err) {
-        console.error('User active check error:', err.message)
+        console.error('Active user verification error:', err.message)
         next(err)
     }
 }

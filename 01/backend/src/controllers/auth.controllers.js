@@ -1,5 +1,5 @@
 const { REFRESH_COOKIE_OPTIONS, REFRESH_COOKIE_MAX_AGE } = require('../configs/cookie.config.js')
-const { verifyUserExistence, findUserByIdentifier, createUser } = require('../repositories/user.repository')
+const { verifyUserExistence, createUser, findUserByIdentifier } = require('../repositories/auth.repository.js')
 const { createSession, findActiveSessionIds, deleteSession, deleteAllSessions, revokeSession, revokeAllSessions } = require('../repositories/session.repository.js')
 const { generateAccessToken, generateRefreshToken } = require('../utils/jwt.utils')
 const { tokenBlacklisting } = require('../utils/blacklist.utils')
@@ -17,13 +17,11 @@ const register = async (req, res, next) =>{
 
         if(password.length < 8){
             // console.error('Registeration error: Password must be at least 8 characters.')
-            
             throw new AppError('Password must be at least 8 characters.', 400)
         }
 
         if(password !== confirmPassword){
             // console.error('Registeration error: Passwords do not match.')
-
             throw new AppError('Passwords do not match.', 400)
         }
 
@@ -31,7 +29,6 @@ const register = async (req, res, next) =>{
 
         if(isUserExists){
             // console.error('Registeration error: User already exists.')
-
             throw new AppError('User already exists.', 409)
         }
 
@@ -72,7 +69,9 @@ const register = async (req, res, next) =>{
 
 const login = async (req, res, next) =>{
     try{
-        const { identifier, password } = req.body
+        // const { identifier, password } = req.body
+        const identifier = req.body?.username || req.body?.email
+        const password = req.body?.password
 
         if(!identifier || !password){
             // console.error('Login error: All fields are required.')
@@ -133,7 +132,10 @@ const login = async (req, res, next) =>{
 
 const logout = async (req, res, next) => {
     try {
-        const { jti, exp, sessionId } = req.tokenData
+        // const { jti, exp, sessionId } = req.tokenData
+        const jti = req.tokenData?.jti
+        const exp = req.tokenData?.exp
+        const sessionId = req.tokenData?.sessionId
         
         if (!jti || !exp || !sessionId) {
             // console.error('Logout error: Received incomplete data:', { jti, exp, sessionId }) 
@@ -166,14 +168,17 @@ const logout = async (req, res, next) => {
 const logoutAll = async (req, res, next) => {
     try {
         const userId = req.user?.id
-        const { jti, exp, sessionId } = req.tokenData
+        // const { jti, exp, sessionId } = req.tokenData
+        const jti = req.tokenData?.jti
+        const exp = req.tokenData?.exp
+        const sessionId = req.tokenData?.sessionId
 
         if (!userId || !jti || !exp || !sessionId) {
             // console.error('Logout error: Received incomplete data:', { jti, exp, sessionId })
             throw new AppError('Invalid or expired session.', 401)
         }
 
-        const blacklistResult = await tokenBlacklisting(jti, exp, 'access')
+        const blacklistToken = await tokenBlacklisting(jti, exp, 'access')
 
         const activeSessions = await findActiveSessionIds(userId)
         
@@ -181,9 +186,30 @@ const logoutAll = async (req, res, next) => {
             throw new AppError('No active sessions found.', 404)
         }
 
-        const sessionResult = await revokeSession(sessionId)
+        const sessionExpiry = 15 * 60
+        console.log('sessionExpiry',sessionExpiry)
+        
+        // const sessionExpiry = Math.floor(Date.now()/1000) - lifeSpan
+        // console.log('sessionExpiry',sessionExpiry)
+        // const blacklistSession = activeSessions.map(session =>{
+        //     console.log(session)
+        //     tokenBlacklisting(sessionId, sessionExpiry, 'session')
+        // })
 
-        if (sessionResult.deletedCount === 0 || sessionResult.modifiedCount === 0) {            
+        for(const session of activeSessions){
+            // console.log(session)
+            const blacklistSession = await tokenBlacklisting(sessionId.toString(), sessionExpiry, 'session')
+            // console.log(blacklistSession)
+        }
+
+        // console.log("1  ",blacklistSession)
+        
+        // const blacklistResult = await Promise.all(blacklistSession)
+        // console.log("2  ",blacklistResult)
+
+        const sessionResult = await revokeAllSessions(userId)
+
+        if (!sessionResult || sessionResult.deletedCount === 0 || sessionResult.modifiedCount === 0) {            
             throw new AppError('No active sessions found.', 404)
         }
 
@@ -192,7 +218,9 @@ const logoutAll = async (req, res, next) => {
         return res.status(200).json({
             success: true,
             message: 'All session logged out successfully.',
-            // sessionResult
+            blacklistToken,
+            activeSessions,
+            sessionResult
         })
         
     } catch(err){

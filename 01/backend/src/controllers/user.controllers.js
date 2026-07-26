@@ -1,34 +1,167 @@
 const User = require('../models/user.model')
-const { findUserByIdentifier, findUserById } = require('../repositories/user.repository')
+const { findUserByIdentifier, findUserById, changeEmailById, compareEmailById, changeEmail, changePassword } = require('../repositories/user.repository')
 const { AppError } = require('../utils/apperror.utils')
+
+// const getProfile = async (req, res, next) =>{
+//     try{
+//         const identifier = req.body?.username || req.body?.email
+        
+//         if(!identifier){
+//             // console.error('error: identifier is required.')
+//             throw new AppError('Username or email is required.', 400)
+//         }
+
+//         const user = await findUserByIdentifier(identifier)
+
+//         if(!user){
+//             // console.error('error: User does not exists.')
+//             throw new AppError('Invalid or expired session.', 401)
+//         }
+
+//         return res.status(201).json({
+//             success: true,
+//             message: 'User profile retrieved successfully.',
+//             // user,
+//             data: {
+//                 username: user.username,
+//                 email: user.email,
+//             }
+//         })
+
+//     } catch(err){
+//         next(err)
+//     }
+// }
 
 const getProfile = async (req, res, next) =>{
     try{
-        const { identifier } = req.body
-        console.log(identifier);
+        const userId = req.user?.id
         
-
-        if(!identifier){
-            console.error('error: identifier is required.')
-            
-            throw new AppError('Username or email is required.', 400)
+        if(!userId){
+            // console.error('error: userId is required.')
+            throw new AppError('Invalid or expired session.', 400)
         }
 
-        const user = await findUserByIdentifier(identifier)
+        const user = await findUserById(userId)
 
         if(!user){
-            console.error('error: User not exists.')
-
-            throw new AppError('Invalid.', 401)
+            // console.error('error: User does not exists.')
+            throw new AppError('Invalid or expired session.', 401)
         }
 
         return res.status(201).json({
             success: true,
             message: 'User profile retrieved successfully.',
-            // user
             data: {
                 username: user.username,
                 email: user.email,
+            }
+        })
+
+    } catch(err){
+        next(err)
+    }
+}
+
+const updateEmail = async (req, res, next) =>{
+    try{
+        const userId = req.user?.id
+        const latestEmail = req.body?.email
+        
+        if(!userId){
+            // console.error('error: userId is required.')
+            throw new AppError('Invalid or expired session.', 400)
+        }
+
+        if(!latestEmail){
+            // console.error('error: email is required.')
+            throw new AppError('Email is required.', 400)
+        }
+        
+        // const comparedEmail = await compareEmailById(userId, latestEmail)
+       
+        // if(!comparedEmail){
+        //     // console.error('error: User does not exists.')
+        //     // throw new AppError('Invalid or expired session.', 401)
+        //     throw new AppError('Previous email cannot be used for new email updated.', 401)
+        // }
+        
+        // const changedEmail = await changeEmailById(userId, latestEmail)
+
+        // if(!changedEmail){
+        //     // console.error('error: User does not exists.')
+        //     // throw new AppError('Invalid or expired session.', 401)
+        //     throw new AppError("Email could not be update.", 401)
+        // }
+
+        const changedEmail = await changeEmail(userId, latestEmail)
+        
+        if(!changedEmail){
+            // console.error('error: Email could not be update.')
+            // throw new AppError('Invalid or expired session.', 401)
+            throw new AppError("Email could not be update.", 401)
+        }
+
+        return res.status(201).json({
+            success: true,
+            message: 'Email updated successfully.',
+            data: {
+                // username: user.username,
+                email: changedEmail.email,
+            }
+        })
+
+    } catch(err){
+        next(err)
+    }
+}
+
+const updatePassword = async (req, res, next) =>{
+    try{
+        const userId = req.user?.id
+        const previousPassword = req.body?.oldPassword
+        const latestPassword = req.body?.newPassword
+        const confirmPassword = req.body?.confirmPassword
+        
+        if(!userId){
+            // console.error('error: userId is required.')
+            throw new AppError('Invalid or expired session.', 400)
+        }
+
+        if(!previousPassword || !latestPassword || !confirmPassword){
+            // console.error('error: previousPassword, latestPassword, confirm password are required.')
+            throw new AppError('All fields are required.', 400)
+        }
+
+        if(previousPassword === latestPassword){
+            // console.error('error: previousPassword and latestPassword could not be similar.')
+            throw new AppError('Old and new password could not be similar.', 400)
+        }
+
+        if(latestPassword.length < 8){
+            // console.error('error: Password must be at least 8 characters.')      
+            throw new AppError('Password must be at least 8 characters.', 400)
+        }
+
+        if(latestPassword !== confirmPassword){
+            // console.error('error: Passwords do not match.')
+            throw new AppError('Passwords do not match.', 400)
+        }
+        
+        const changedPassword = await changePassword(userId, previousPassword, latestPassword)
+        
+        if(!changedPassword){
+            // console.error('error: Email could not be update.')
+            // throw new AppError('Invalid or expired session.', 401)
+            throw new AppError("Password could not be update.", 401)
+        }
+
+        return res.status(201).json({
+            success: true,
+            message: 'Password changed successfully.',
+            data: {
+                // username: user.username,
+                // email: user.email,
             }
         })
 
@@ -103,5 +236,7 @@ const getProfile = async (req, res, next) =>{
 // }
 
 module.exports = {
-    getProfile
+    getProfile,
+    updateEmail,
+    updatePassword,
 }

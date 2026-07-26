@@ -60,16 +60,15 @@ const deleteAllSessions = async (userId) => {
 const revokeSession = async (sessionId) => {
     if(!sessionId) throw new Error('sessionId is required.')
         
-    return Session.findOneAndUpdate(
-            { 
-                _id: sessionId, 
-                isRevoked: false 
-            },
-            { $set: { 
-                // refreshToken: null,
-                isRevoked: true,
-                revokedAt: new Date()
-            } 
+    return Session.findOneAndUpdate({ 
+          _id: sessionId, 
+          isRevoked: false 
+        },
+        { $set: { 
+            // refreshToken: null,
+            isRevoked: true,
+            revokedAt: new Date()
+            }
         },
         { returnDocument: 'after' }
         // { new: true }
@@ -82,8 +81,8 @@ const revokeAllSessions = async (userId) => {
     if(!userId) throw new Error('userId is required.')
 
     return Session.updateMany({ 
-        userId,  
-        isRevoked: false 
+          userId,  
+          isRevoked: false 
         },
         { $set: { 
             // refreshToken: null,

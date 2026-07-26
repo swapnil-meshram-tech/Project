@@ -12,7 +12,7 @@ const generateAccessToken = (userId, role, sessionId) =>{
            sessionId,
            jti: generateUUID()
         }, config.JWT_ACCESS_SECRET, {
-           expiresIn: '15m'
+           expiresIn: '2d'
         }
    )
 }
