@@ -10,7 +10,7 @@ const config = require('../src/configs/env')
 const authRouter = require('./routes/auth.routes')
 const adminRouter = require('./routes/admin.routes')
 const userRouter = require('./routes/user.routes')
-const { notFoundErrorHandler, globalErrorHandler } = require('./middlewares/error.middleware')
+const { notFoundErrorHandler, jsonSyntaxErrorHandler, globalErrorHandler } = require('./middlewares/error.middleware')
 const { rejectEmptyBody } = require('./middlewares/validation.middleware')
 
 const app = express()
@@ -68,6 +68,7 @@ app.use('/api/v1/auth', authRouter)
 app.use('/api/v1/user', userRouter)
 
 app.use(notFoundErrorHandler)
+app.use(jsonSyntaxErrorHandler)
 app.use(globalErrorHandler)
 
 module.exports = app

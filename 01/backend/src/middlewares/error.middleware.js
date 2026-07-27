@@ -2,6 +2,7 @@ const { AppError } = require('../utils/apperror.utils')
 
 const notFoundErrorHandler = (req, res, next) =>{
     const error = new AppError(`Not Found - ${req.originalUrl}`, 404)
+    
     next(error)
 }
 
@@ -13,10 +14,8 @@ const jsonSyntaxErrorHandler = (err, req, res, next) =>{
     next(err)
 }
 
-const globalErrorHandler = (err, req, res, next) =>{
-    
-    
 
+const globalErrorHandler = (err, req, res, next) =>{
     const statusCode = err.statusCode || 500
     const location = err.stack.split('\n')[1]?.trim()
     const type = err.isOperational ? 'CLIENT ERROR' : 'SERVER ERROR'
@@ -36,4 +35,5 @@ const globalErrorHandler = (err, req, res, next) =>{
 module.exports = {
     notFoundErrorHandler,
     globalErrorHandler,
+    jsonSyntaxErrorHandler
 }

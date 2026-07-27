@@ -11,24 +11,24 @@ const register = async (req, res, next) =>{
         const { username, email, password, confirmPassword } = req.body
 
         if(!username || !email || !password || !confirmPassword){
-            // console.error('Registeration error: All fields are required.')
+            // console.error('error: All fields are required.')
             throw new AppError('All fields are required.', 400)
         }
 
         if(password.length < 8){
-            // console.error('Registeration error: Password must be at least 8 characters.')
+            // console.error('error: Password must be at least 8 characters.')
             throw new AppError('Password must be at least 8 characters.', 400)
         }
 
         if(password !== confirmPassword){
-            // console.error('Registeration error: Passwords do not match.')
+            // console.error('error: Passwords do not match.')
             throw new AppError('Passwords do not match.', 400)
         }
 
         const isUserExists = await verifyUserExistence(username, email)
 
         if(isUserExists){
-            // console.error('Registeration error: User already exists.')
+            // console.error('error: User already exists.')
             throw new AppError('User already exists.', 409)
         }
 
@@ -36,8 +36,8 @@ const register = async (req, res, next) =>{
 
         const refreshToken = generateRefreshToken(user._id)
         
-        const ip = req.ip || req.headers['x-forwarded-for']?.split(',')[0].trim() || req.socket?.remoteAddress || 'unknown'
         const userAgent = req.headers['user-agent'] || 'unknown'
+        const ip = req.ip || req.headers['x-forwarded-for']?.split(',')[0].trim() || req.socket?.remoteAddress || 'unknown'
         
         const newSession = await createSession(user._id, userAgent, ip, refreshToken)
         
@@ -69,8 +69,14 @@ const register = async (req, res, next) =>{
 
 const login = async (req, res, next) =>{
     try{
-        const { username, email, password } = req.body ?? {}
+        const { username, email, password } = req.body
         const identifier = username || email
+        
+        // ^ take both at time username,email
+        // const identifier = req.body?.username || req.body?.email
+        // const password = req.body?.password
+
+        // "password": 123  => "message": "Internal server error"
 
         if(!identifier || !password){
             // console.error('Login error: All fields are required.')
