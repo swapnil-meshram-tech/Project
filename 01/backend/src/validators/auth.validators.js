@@ -38,7 +38,7 @@ const authSchemas = {
     })
     .refine((data) => data.password === data.confirmPassword, {
         message: "Passwords do not match",
-        path: ["confirmPassword"] // Attaches the error to the confirmPassword field
+        path: ["confirmPassword"]
     }),
 
     login: z.object({
