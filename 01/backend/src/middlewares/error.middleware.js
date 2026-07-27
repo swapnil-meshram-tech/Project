@@ -1,9 +1,9 @@
 const { AppError } = require('../utils/apperror.utils')
 
 const notFoundErrorHandler = (req, res, next) =>{
-    const error = new AppError(`Not Found - ${req.originalUrl}`, 404)
+    const err = new AppError(`Not Found - ${req.originalUrl}`, 404)
     
-    next(error)
+    next(err)
 }
 
 const jsonSyntaxErrorHandler = (err, req, res, next) =>{
@@ -14,6 +14,13 @@ const jsonSyntaxErrorHandler = (err, req, res, next) =>{
     next(err)
 }
 
+const ValidationErrorHandler = (err, req, res, next) =>{
+    if (err.name === 'ValidationError') {
+        err = new AppError('Invalid JSON format in request body.', 400)
+    }
+
+    next(err)
+}
 
 const globalErrorHandler = (err, req, res, next) =>{
     const statusCode = err.statusCode || 500
