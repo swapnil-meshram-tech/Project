@@ -3,9 +3,9 @@ const { z } = require('zod')
 const authSchemas = {
     register: z.object({
         username: z.string({ required_error: "Username is required" })
-            .refine(val => !/\s/.test(val), { 
-                message: "Username cannot contain spaces, tabs, or new lines" 
-            })
+            // .refine(val => !/\s/.test(val), { 
+            //     message: "Username cannot contain spaces, tabs, or new lines" 
+            // })
 
             .min(4, "Username must be at least 4 characters")
             .max(15, "Username cannot exceed 15 characters")
@@ -17,7 +17,7 @@ const authSchemas = {
                 message: "Email cannot contain spaces, tabs, or new lines" 
             })
             
-            .regex(/^[a-z][a-z0-9._]*@/, "Email must start with a lowercase and contain only small letters, numbers, dots, or underscores before @")
+            .regex(/^[a-z][a-z0-9._]*@[a-z0-9.-]+\.[a-z]{2,}$/, "Email must start with a lowercase and contain only letters, numbers, dots, or underscores before @")
             
             .email("Enter a valid email")
             .transform(val => val.toLowerCase()),
@@ -26,10 +26,13 @@ const authSchemas = {
             .min(8, "Password must be at least 8 characters")
             .max(30, "Password cannot exceed 30 characters")
             
+            .regex(/^[^\t\n]*$/, "Password cannot contain tabs or newlines")
             .regex(/^[a-zA-Z]/, "Password must start with a letter")
-            .regex(/[^\s]$/, "Password cannot end with a space, tab, or newline")
+            .regex(/[^ ]$/, "Password cannot end with a space")
+            .regex(/(?=.*[a-z])/, "Password must contain at least one lowercase letter")
+            .regex(/(?=.*[A-Z])/, "Password must contain at least one uppercase letter")
             .regex(/(?=.*[0-9])/, "Password must contain at least one number")
-            .regex(/(?=.*[^a-zA-Z0-9\s])/, "Password must contain at least one special character"),
+            .regex(/(?=.*[^a-zA-Z0-9 ])/, "Password must contain at least one special character"),
             
         confirmPassword: z.string({ required_error: "Confirm password is required" })
     })
