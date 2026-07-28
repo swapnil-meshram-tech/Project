@@ -19,8 +19,8 @@ const authSchemas = {
             
             .regex(/^[a-z][a-z0-9._]*@[a-z0-9.-]+\.[a-z]{2,}$/, "Email must start with a lowercase and contain only letters, numbers, dots, or underscores before @")
             
-            .email("Enter a valid email")
-            .transform(val => val.toLowerCase()),
+            .pipe(z.email("Enter a valid email")),
+            // .transform(val => val.toLowerCase()),
 
         password: z.string({ required_error: "Password is required" })
             .min(8, "Password must be at least 8 characters")
@@ -42,8 +42,14 @@ const authSchemas = {
     }),
 
     login: z.object({
-        email: z.string({ required_error: "Email is required" }).email("Invalid email address").trim(),
-        password: z.string({ required_error: "Password is required" }).min(1, "Password is required")
+        email: z.string({ required_error: "Email is required" })
+            .refine(val => !/\s/.test(val), { 
+                 message: "Email cannot contain spaces, tabs, or new lines" 
+            })
+            .email("Enter a valid email"),
+            
+        password: z.string({ required_error: "Password is required" })
+            .min(1, "Password is required")
     })
 }
 

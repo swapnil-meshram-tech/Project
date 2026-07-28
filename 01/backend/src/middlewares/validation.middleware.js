@@ -1,6 +1,6 @@
 const { AppError } = require('../utils/apperror.utils')
 
-const rejectEmptyBody = (req, res, next) =>{
+const rejectEmptyRequestBody = (req, res, next) =>{
     const methods = ['POST', 'PUT', 'PATCH']
 
     if (methods.includes(req.method) && (!req.body || Object.keys(req.body).length === 0)) {
@@ -13,5 +13,5 @@ const rejectEmptyBody = (req, res, next) =>{
 }
 
 module.exports = {
-    rejectEmptyBody
+    rejectEmptyRequestBody
 }
