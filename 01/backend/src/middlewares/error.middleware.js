@@ -3,7 +3,7 @@ const { ZodError } = require('zod')
 
 const notFoundErrorHandler = (req, res, next) =>{
     const err = new AppError(`Not Found - ${req.originalUrl}`, 404)
-    
+
     next(err)
 }
 
@@ -20,16 +20,18 @@ const zodErrorHandler = (err, req, res, next) =>{
         const firstIssue = err.errors[0]
         const fieldName = firstIssue?.path[0]
         const message = firstIssue?.message || 'Inavlid input.'
-        err = new AppError('Invalid JSON format in request body.', 400)
+        err = new AppError(message, 400)
     }
 
     next(err)
 }
 
 
-const ValidationErrorHandler = (err, req, res, next) =>{
-    if (err.name === 'ValidationError') {
-        err = new AppError('Invalid JSON format in request body.', 400)
+const mongooseValidationErrorHandler = (err, req, res, next) =>{
+    if (err.name === 'ValidationError' && err.errors) {
+        const firstField = Object.keys(err.errors)[0]
+        const message = err.errors[firstField]?.message || 'Inavlid input.'
+        err = new AppError(message, 400)
     }
 
     next(err)
@@ -54,6 +56,7 @@ const globalErrorHandler = (err, req, res, next) =>{
 
 module.exports = {
     notFoundErrorHandler,
+    jsonSyntaxErrorHandler,
+    zodErrorHandler,
     globalErrorHandler,
-    jsonSyntaxErrorHandler
 }

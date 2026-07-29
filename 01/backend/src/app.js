@@ -1,17 +1,17 @@
 const express = require('express')
 const helmet = require('helmet')
 const cors = require('cors')
-const mongoSanitize = require('express-mongo-sanitize')
 const morgan = require('morgan')
 const cookieParser = require('cookie-parser')
-const compress = require('./middlewares/compression.middleware')
-const { apiLimiter, authLimiter } = require('./middlewares/ratelimiter.middleware')
 const config = require('../src/configs/env')
 const authRouter = require('./routes/auth.routes')
 const adminRouter = require('./routes/admin.routes')
 const userRouter = require('./routes/user.routes')
-const { notFoundErrorHandler, jsonSyntaxErrorHandler, globalErrorHandler } = require('./middlewares/error.middleware')
 const { rejectEmptyRequestBody } = require('./middlewares/validation.middleware')
+const { notFoundErrorHandler, jsonSyntaxErrorHandler, zodErrorHandler, globalErrorHandler } = require('./middlewares/error.middleware')
+const { apiLimiter, authLimiter } = require('./middlewares/ratelimiter.middleware')
+const mongoSanitize = require('express-mongo-sanitize')
+const compress = require('./middlewares/compression.middleware')
 
 const app = express()
 
@@ -69,6 +69,7 @@ app.use('/api/v1/user', userRouter)
 
 app.use(notFoundErrorHandler)
 app.use(jsonSyntaxErrorHandler)
+app.use(zodErrorHandler)
 app.use(globalErrorHandler)
 
 module.exports = app
