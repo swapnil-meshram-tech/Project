@@ -18,6 +18,7 @@ const jsonSyntaxErrorHandler = (err, req, res, next) =>{
 const zodErrorHandler = (err, req, res, next) =>{
     if (err instanceof ZodError) {
         const firstIssue = err.errors[0]
+        const fieldName = firstIssue?.path[0]
         const message = firstIssue?.message || 'Inavlid input.'
         err = new AppError('Invalid JSON format in request body.', 400)
     }
