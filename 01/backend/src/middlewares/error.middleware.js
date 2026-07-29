@@ -1,4 +1,5 @@
 const { AppError } = require('../utils/apperror.utils')
+const { ZodError } = require('zod')
 
 const notFoundErrorHandler = (req, res, next) =>{
     const err = new AppError(`Not Found - ${req.originalUrl}`, 404)
@@ -13,6 +14,17 @@ const jsonSyntaxErrorHandler = (err, req, res, next) =>{
 
     next(err)
 }
+
+const zodErrorHandler = (err, req, res, next) =>{
+    if (err instanceof ZodError) {
+        const firstIssue = err.errors[0]
+        const message = firstIssue?.message || 'Inavlid input.'
+        err = new AppError('Invalid JSON format in request body.', 400)
+    }
+
+    next(err)
+}
+
 
 const ValidationErrorHandler = (err, req, res, next) =>{
     if (err.name === 'ValidationError') {
