@@ -1,6 +1,6 @@
 const { z } = require('zod')
 
-const authSchemas = {
+const authSchema = {
     register: z.object({
         username: z.string({ required_error: "Username is required" })
             // .refine(val => !/\s/.test(val), { 
@@ -53,6 +53,6 @@ const authSchemas = {
     })
 }
 
-module.eports = {
-    authSchemas
+module.exports = {
+    authSchema
 }

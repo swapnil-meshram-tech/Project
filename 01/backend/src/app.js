@@ -7,8 +7,7 @@ const config = require('../src/configs/env')
 const authRouter = require('./routes/auth.routes')
 const adminRouter = require('./routes/admin.routes')
 const userRouter = require('./routes/user.routes')
-const { rejectEmptyRequestBody } = require('./middlewares/validation.middleware')
-const { notFoundErrorHandler, jsonSyntaxErrorHandler, zodErrorHandler, globalErrorHandler } = require('./middlewares/error.middleware')
+const { notFoundErrorHandler, jsonSyntaxErrorHandler, zodErrorHandler, mongooseValidationErrorHandler, globalErrorHandler } = require('./middlewares/error.middleware')
 const { apiLimiter, authLimiter } = require('./middlewares/ratelimiter.middleware')
 const mongoSanitize = require('express-mongo-sanitize')
 const compress = require('./middlewares/compression.middleware')
@@ -37,15 +36,13 @@ app.use(express.urlencoded({ limit: '10kb', extended: true }))
 
 app.use(cookieParser())
 
-app.use(rejectEmptyRequestBody)
-
 // app.use(mongoSanitize({
 //   allowDots: false,        // strip keys with dots (default: false = strip them)
 //   replaceWith: '_',
 // }))
 
 app.get('/', (req, res) =>{
-    res.send('server is running.');
+    res.send('server is running.')
     // res.status(200).json({
     //     success: true,
     //     message: 'Server is Active.'
@@ -68,8 +65,9 @@ app.use('/api/v1/auth', authRouter)
 app.use('/api/v1/user', userRouter)
 
 app.use(notFoundErrorHandler)
-app.use(jsonSyntaxErrorHandler)
-app.use(zodErrorHandler)
+// app.use(jsonSyntaxErrorHandler)
+// app.use(zodErrorHandler)
+// app.use(mongooseValidationErrorHandler)
 app.use(globalErrorHandler)
 
 module.exports = app

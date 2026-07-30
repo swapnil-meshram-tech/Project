@@ -3,10 +3,11 @@
   "version": "1.0.0",
   "main": "index.js",
   "scripts": {
-    "dev": "docker start redis && nodemon server.js",
+    "dev-test": "docker start redis && nodemon server.js",
     "test": "jest",
     "test:watch": "jest --watch",
-    "start": "docker start redis && node server.js"
+    "start-test": "docker start redis && node server.js",
+    "dev": "node dev.js"
   },
   "keywords": [],
   "author": "",
