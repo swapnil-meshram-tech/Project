@@ -9,11 +9,12 @@ const { sendMessage, getChatHistory } = require('../controllers/chat.controllers
 const authRouter = Router()
 
 // authRouter.post('/register', registerLimiter, register)
-authRouter.post('/register', rejectEmptyRequestBody, register)
-    //  validateSchema(authSchema.register), 
+authRouter.post('/register', rejectEmptyRequestBody, 
+    validateSchema(authSchema.register), 
+    register)
     
 authRouter.post('/login', rejectEmptyRequestBody, 
-    // validateSchema(authSchema.login), 
+    validateSchema(authSchema.login), 
     login)
 
 authRouter.post('/logout', verifyAccessToken, logout)

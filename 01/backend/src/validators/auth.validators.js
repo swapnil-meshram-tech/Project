@@ -36,6 +36,7 @@ const authSchema = {
             
         confirmPassword: z.string({ required_error: "Confirm password is required" })
     })
+    .strict()
     .refine((data) => data.password === data.confirmPassword, {
         message: "Passwords do not match",
         path: ["confirmPassword"]
@@ -51,6 +52,7 @@ const authSchema = {
         password: z.string({ required_error: "Password is required" })
             .min(1, "Password is required")
     })
+    .strict()
 }
 
 module.exports = {
