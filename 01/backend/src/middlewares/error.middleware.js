@@ -23,16 +23,27 @@ const jsonSyntaxErrorHandler = (err, req, res, next) =>{
 const zodErrorHandler = (err, req, res, next) =>{
     if (err instanceof ZodError) {
         const issues = err.issues || []
-        const firstIssue = issues[0]
-        // console.log(err.issues)
-        console.log(firstIssue)
-        console.log(firstIssue?.path.join('.'))
-        console.log(firstIssue?.message)
-        const fieldPath = firstIssue?.path.join('.') || 'input'
-        const rawMessage = firstIssue?.message || 'Invalid input'
-        const cleanMessage = firstIssue.path.includes(fieldPath) ? rawMessage :  `Validation failed on field [${fieldPath}]: ${rawMessage}`
-        err = new AppError(cleanMessage, 400)
-        console.log(Object.values(firstIssue))
+
+        const errors = issues.map((issue) =>{
+            
+            if(issue.code === 'unrecognized_keys'){
+                return {
+                    field: issue.keys?.join(', ') || 'unknown', 
+                    message: 'This field is not recognized.'
+                }
+            }
+            
+            console.log(issue)
+            console.log(issue.code)
+            return {
+                field: issue.path?.join('.'), 
+                message: issue.message
+            }
+        })
+
+        // console.log(errors)
+        
+        err = new AppError('Validation Failed', 400, errors)
     }
 
     next(err)
