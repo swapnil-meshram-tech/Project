@@ -20,12 +20,11 @@ const jsonSyntaxErrorHandler = (err, req, res, next) =>{
     next(err)
 }
 
-const zodErrorHandler = (err, req, res, next) =>{
+const zodErrorHandler = (err, req, res, next) =>{ 
     if (err instanceof ZodError) {
         const issues = err.issues || []
 
         const errors = issues.map((issue) =>{
-            
             if(issue.code === 'unrecognized_keys'){
                 return {
                     field: issue.keys?.join(', ') || 'unknown', 
@@ -33,17 +32,15 @@ const zodErrorHandler = (err, req, res, next) =>{
                 }
             }
             
-            console.log(issue)
-            console.log(issue.code)
             return {
                 field: issue.path?.join('.'), 
                 message: issue.message
             }
         })
-
-        // console.log(errors)
         
-        err = new AppError('Validation Failed', 400, errors)
+        error = new AppError('Validation Failed', 400, errors)
+        
+        return next(error)
     }
 
     next(err)
@@ -68,10 +65,12 @@ const globalErrorHandler = (err, req, res, next) =>{
     // console.error(`\n[${statusCode}] ${req.method} ${req.originalUrl}`)
     console.error(`\n[${statusCode}] ${type} - ${err.message}`)
     console.error(`\t↳ ${location}\n`)
+
+    const result = err.errors ? { message, error: err.errors } : message
     
     return res.status(statusCode).json({
         success: false,
-        message
+        result
     })
 }
 
