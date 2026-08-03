@@ -3,9 +3,9 @@ const { AppError } = require('../utils/apperror.utils')
 const rejectEmptyRequestBody = (req, res, next) =>{
        
     if (req.headers['content-length'] === '0') {
-        const error = new AppError('Request body cannot be empty.', 400)
+        const appError = new AppError('Request body cannot be empty.', 400)
         
-        return next(error)
+        return next(appError)
     }
 
     const isBodyValid = req.body && 

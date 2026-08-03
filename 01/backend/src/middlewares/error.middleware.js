@@ -2,9 +2,9 @@ const { AppError } = require('../utils/apperror.utils')
 const { ZodError } = require('zod')
 
 const notFoundHandler = (req, res, next) =>{    
-    const error = new AppError(`Route not found - ${req.originalUrl}`, 404)
+    const appError = new AppError(`Route not found - ${req.originalUrl}.`, 404)
     
-    next(error)
+    next(appError)
 }
 
 const jsonSyntaxErrorHandler = (err, req, res, next) =>{
@@ -12,17 +12,18 @@ const jsonSyntaxErrorHandler = (err, req, res, next) =>{
     const isJsonMalformed = err.status === 400 && err.type === 'entity.parse.failed'
     
     if (isJsonMalformed) {
-        const error = new AppError('Invalid JSON format in request body.', 400)
+        const appError = new AppError('Invalid JSON format in request body.', 400)
 
-        return next(error)
+        return next(appError)
     }
 
     next(err)
 }
 
 const zodErrorHandler = (err, req, res, next) =>{ 
+    
     if (err instanceof ZodError) {
-        const issues = err.issues || []
+        const issues = err.issues || err.errors || []
 
         const errors = issues.map((issue) =>{
             if(issue.code === 'unrecognized_keys'){
@@ -33,14 +34,14 @@ const zodErrorHandler = (err, req, res, next) =>{
             }
             
             return {
-                field: issue.path?.join('.'), 
-                message: issue.message
+                field: issue.path?.join('.') || 'unknown', 
+                message: issue.message || 'Invalid input.'
             }
         })
         
-        error = new AppError('Validation Failed', 400, errors)
+        const appError = new AppError('Validation failed.', 400, errors)
         
-        return next(error)
+        return next(appError)
     }
 
     next(err)
@@ -66,12 +67,14 @@ const globalErrorHandler = (err, req, res, next) =>{
     console.error(`\n[${statusCode}] ${type} - ${err.message}`)
     console.error(`\t↳ ${location}\n`)
 
-    const result = err.errors ? { message, error: err.errors } : message
+    const response = { 
+        success: false, 
+        message
+    }  
+
+    if(err.errors) response.errors = err.errors
     
-    return res.status(statusCode).json({
-        success: false,
-        result
-    })
+    return res.status(statusCode).json(response)
 }
 
 module.exports = {
