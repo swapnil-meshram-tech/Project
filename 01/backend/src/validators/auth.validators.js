@@ -1,28 +1,49 @@
 const { z } = require('zod')
 
+const DISPOSABLE_DOMAINS = new Set([
+  'tempmail.com',
+  'temp-mail.xyz',
+  'throwawaymail.com',
+  'mailinator.com',
+  'yopmail.com',
+  '10minutemail.com'
+])
+
 const authSchema = {
     register: z.object({
-        username: z.string({ required_error: 'Username is required' })
+        username: z
+            .string({ required_error: 'Username is required' })
             .min(6, 'Username must be between 6 and 30 characters.')
             .max(30, 'Username must be between 6 and 30 characters.')
             
-            .regex(/^[a-z]/, 'Username must start with a lowercase letter.')
+            .regex(/^[a-z]/, 'Username must start with lowercase letter.')
             .regex(/^[a-z0-9_-]*$/, 'Username can only contain lowercase letters, numbers, underscores and hyphens.'),
 
-        email: z.string({ required_error: 'Email is required' })
-            .refine(val => !/\s/.test(val), { 
-                message: 'Email cannot contain spaces, tabs, or new lines' 
-            })
+        email: z
+            .string({ required_error: 'Email is required' })
+            .min(5, 'Email address is too short.')
+            .max(255, 'Email address cannot exceed 255 characters.')
 
-            .regex(/^[a-z0-9]/, 'Email must start with a letter or number.')
+            // .regex(/^\S*$/, 'Email cannot contain spaces, tabs, or new lines.')
+            .regex(/^[^A-Z]*$/, 'Email must be lowercase only.')
+            .regex(/^[a-z0-9_.-]/, 'Email must start with a lowercase letter, number, or valid symbol.')
             
-            // .regex(/^[a-z][a-z0-9._]*@[a-z0-9.-]+\.[a-z]{2,}$/, 'Email must start with a lowercase and contain only letters, numbers, dots, or underscores before @')
-            .regex(/^[a-z0-9](?:[a-z0-9._+-]*[a-z0-9])?$/, 'Email must start with a lowercase and contain only letters, numbers, dots, or underscores before @')
+            .refine((val) => !val.includes('..'), {
+                message: 'Email cannot contain consecutive dots.'
+            })
             
-            .pipe(z.email('Enter a valid email')),
+            .pipe(z.email('Enter valid email format (e.g., name@example.com).'))
+            
+            .refine((val) => {
+                const domain = val.split('@')[1]  
+                return !DISPOSABLE_DOMAINS.has(domain) 
+            }, { 
+                message: 'Disposable or temporary email addresses are not allowed.'
+            }),
             // .transform(val => val.toLowerCase()),
 
-        password: z.string({ required_error: 'Password is required' })
+        password: z
+            .string({ required_error: 'Password is required' })
             .min(8, 'Password must be between 8 and 64 characters.')
             .max(64, 'Password must be between 8 and 64 characters.')
             
@@ -34,7 +55,8 @@ const authSchema = {
             .regex(/[0-9]/, 'Password must contain at least one number.')
             .regex(/[^a-zA-Z0-9\s]/, 'Password must contain at least one special character.'),
         
-        confirmPassword: z.string({ required_error: 'Confirm password is required' })
+        confirmPassword: z
+            .string({ required_error: 'Confirm password is required' })
     })
     .strict()
     .refine((data) => data.username !== data.email, {
@@ -58,13 +80,15 @@ const authSchema = {
     }),
 
     login: z.object({
-        email: z.string({ required_error: 'Email is required' })
+        email: z
+            .string({ required_error: 'Email is required' })
             .refine(val => !/\s/.test(val), { 
                  message: 'Email cannot contain spaces, tabs, or new lines' 
             })
             .email('Enter a valid email'),
             
-        password: z.string({ required_error: 'Password is required' })
+        password: z
+            .string({ required_error: 'Password is required' })
             .min(1, 'Password is required')
     })
     .strict()
