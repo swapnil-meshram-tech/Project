@@ -1,6 +1,6 @@
 const { z } = require('zod')
 
-const DISPOSABLE_DOMAINS = new Set([
+const TEMPORARY_DOMAINS = new Set([
   'tempmail.com',
   'temp-mail.xyz',
   'throwawaymail.com',
@@ -13,34 +13,34 @@ const authSchema = {
     register: z.object({
         username: z
             .string({ required_error: 'Username is required' })
-            .trim() 
             .min(6, 'Username must be between 6 and 30 characters.')
             .max(30, 'Username must be between 6 and 30 characters.')
             
+            .regex(/^\S*$/, 'Username cannot contain spaces, tabs or new lines.')
             .regex(/^[a-z]/, 'Username must start with lowercase letter.')
             .regex(/^[a-z0-9_-]+$/, 'Username can only contain lowercase letters, numbers, underscores and hyphens.'),
 
         email: z
             .string({ required_error: 'Email is required' })
-            .trim() 
             .min(6, 'Email address is too short.')
             .max(255, 'Email address cannot exceed 255 characters.')
 
-            // .regex(/^\S*$/, 'Email cannot contain spaces, tabs, or new lines.')
+            .regex(/^\S*$/, 'Email cannot contain spaces, tabs or new lines.')
             .regex(/^[^A-Z]*$/, 'Email must be lowercase only.')
-            .regex(/^[a-z0-9_.\+\-]/, 'Email must start with a lowercase letter, number, or valid symbol.')
+            .regex(/^[a-z0-9_.+-]/, 'Email must start with a lowercase letter, number, or valid symbol.')
+            // .regex(/^[a-z0-9]/, 'Email must start with a lowercase letter, number, or valid symbol.')
             
             .refine((val) => !val.includes('..'), {
                 message: 'Email cannot contain consecutive dots.'
             })
             
-            .pipe(z.email('Enter valid email addresss format (e.g., name@example.com).'))
+            .pipe(z.email('Enter valid email addresss (e.g. user@domain.com).'))
             
             .refine((val) => {
                 const domain = val.split('@')[1] || ''
-                return !DISPOSABLE_DOMAINS.has(domain) 
+                return !TEMPORARY_DOMAINS.has(domain) 
             }, { 
-                message: 'Disposable or temporary email addresses are not allowed.'
+                message: 'Temporary email address are not allowed.'
             }),
             // .transform(val => val.toLowerCase()),
 
@@ -86,7 +86,7 @@ const authSchema = {
     login: z.object({
         identifier: z
             .string({ required_error: 'Email is required' })
-            .min(6, 'Invalid credentials.') 
+            .min(5, 'Invalid credentials.') 
             .max(255, 'Invalid credentials.')
             .regex(/^[^A-Z]+$/, 'Invalid credentials.')
             .regex(/^\S+$/, 'Invalid credentials.'),

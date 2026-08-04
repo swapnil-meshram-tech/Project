@@ -34,8 +34,8 @@ const zodErrorHandler = (err, req, res, next) =>{
             }
             
             return {
-                field: issue.path?.join('.') || 'unknown', 
-                message: issue.message || 'Invalid input.'
+                field: issue.path?.join('.'), 
+                message: issue.message
             }
         })
         
