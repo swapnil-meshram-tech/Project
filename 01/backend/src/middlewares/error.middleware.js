@@ -24,21 +24,86 @@ const zodErrorHandler = (err, req, res, next) =>{
     
     if (err instanceof ZodError) {
         const issues = err.issues || err.errors || []
+        console.log('zodErrorHandler HIT, raw issues:', err.issues.length);
+        console.log('zodErrorHandler HIT, raw issues:', JSON.stringify(err.issues, null, 2));
+        // const errors = issues.map((issue) =>{
+        //     if(issue.code === 'unrecognized_keys'){
+        //         return {
+        //             field: issue.keys?.join(', ') || 'unknown', 
+        //             message: 'This field is not recognized.'
+        //         }
+        //     }
 
-        const errors = issues.map((issue) =>{
-            if(issue.code === 'unrecognized_keys'){
-                return {
-                    field: issue.keys?.join(', ') || 'unknown', 
-                    message: 'This field is not recognized.'
-                }
-            }
+        //     if(issue.code === 'invalid_type'){
+        //         return {
+        //             field: issue.path?.join('.'), 
+        //             message: issue.message
+        //         }
+        //     }
+
+        //     return null
             
-            return {
-                field: issue.path?.join('.'), 
-                message: issue.message
-            }
-        })
+        //     // return {
+        //     //     field: issue.path?.join('.'), 
+        //     //     message: issue.message
+        //     // }
+        // }).filter(Boolean)
+
+        // const errors = []
+
+        // for (const issue of issues) {
+        //     if (issue.code === 'unrecognized_keys') {
+        //         errors.push({
+        //             field: issue.keys?.join(', ') || 'unknown',
+        //             message: 'This field is not recognized.'
+        //         })
+        //         continue
+        //     }
         
+        //     const field = issue.path?.join('.')
+        //     if (seen.has(field)) continue
+        
+        //     seen.add(field)
+        //     errors.push({ field, message: issue.message })
+        // }
+
+        const invalidTypeFields = new Set()
+        const errors = []
+    
+        for (const issue of err.issues) {
+            if (issue.code === 'unrecognized_keys') {
+                errors.push({ 
+                    field: issue.keys?.join(', '), 
+                    message: 'This field is not recognized.' 
+                })
+
+                continue
+            }
+
+            const field = issue.path?.join('.')
+
+            if (issue.code === 'invalid_type') {
+                invalidTypeFields.add(field)
+                
+                errors.push({ 
+                    field,
+                    message: issue.message 
+                })
+
+                continue
+            }
+
+            if (invalidTypeFields.has(field))  continue
+
+            errors.push({
+                field,
+                message: issue.message
+            })
+        }
+
+        console.log(errors);
+        
+
         const appError = new AppError('Validation failed.', 400, errors)
         
         return next(appError)
