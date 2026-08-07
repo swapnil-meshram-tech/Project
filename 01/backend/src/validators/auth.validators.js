@@ -12,9 +12,9 @@ const TEMPORARY_DOMAINS = new Set([
 const authSchema = {
     register: z.object({
         username: z
-            .string({ error: 'Username must be a string.' })
+            .string({ error: 'Username is required and must be a string.' })
             .min(1, {
-                message:'Username is required.', 
+                message: 'Username is required.', 
                 abort: true
             })
             .min(6, 'Username must be between 6 and 30 characters.')
@@ -22,10 +22,12 @@ const authSchema = {
             
             .regex(/^\S*$/, 'Username cannot contain spaces, tabs or new lines.')
             .regex(/^[a-z]/, 'Username must start with lowercase letter.')
-            .regex(/^[a-z0-9_-]+$/, 'Username can only contain lowercase letters, numbers, underscores and hyphens.'),
+            .regex(/^[a-z0-9_.-]+$/, 'Username can only contain lowercase letters, numbers, underscores and hyphens.')
+            .regex(/[a-z0-9]$/, 'Username cannot end with a special character.')
+            .regex(/^(?!.*[-_]{2}).+$/, 'No consecutive special characters allowed.'),
 
         email: z
-            .string({ error: 'Email must be a string.' })
+            .string({ error: 'Email is required and must be a string.' })
             .min(1, {
                 message:'Email is required.', 
                 abort: true
@@ -53,7 +55,7 @@ const authSchema = {
             // .transform(val => val.toLowerCase()),
 
         password: z
-            .string({ error: 'Password must be a string.' })
+            .string({ error: 'Password is required and must be a string.' })
             .min(1, {
                 message:'Password is required.', 
                 abort: true
@@ -72,7 +74,7 @@ const authSchema = {
             .regex(/[^a-zA-Z0-9\s]/, 'Password must contain at least one special character.'),
         
         confirmPassword: z
-            .string({ error: 'Confirm password must be a string.' })
+            .string({ error: 'Confirm password is required and must be a string.' })
             .min(1, {
                 message:'Confirm password is required.', 
                 abort: true
@@ -137,7 +139,7 @@ const authSchema = {
 
     login: z.object({
         identifier: z
-            .string({ error: 'Identifier must be a string.' })
+            .string({ error: 'Identifier is required and must be a string.' })
             .min(1, {
                 message:'Identifier is required.', 
                 abort: true
@@ -148,7 +150,7 @@ const authSchema = {
             .regex(/^\S+$/, 'Invalid credentials.'),
             
         password: z
-            .string({ error: 'Password must be a string.' })
+            .string({ error: 'Password is required and must be a string.' })
             .min(1, {
                 message:'Password is required.', 
                 abort: true

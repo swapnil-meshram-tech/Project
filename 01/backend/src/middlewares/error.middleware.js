@@ -72,22 +72,25 @@ const zodErrorHandler = (err, req, res, next) =>{
     
         for (const issue of err.issues) {
             if (issue.code === 'unrecognized_keys') {
-                errors.push({ 
-                    field: issue.keys?.join(', '), 
+                for (const key of issue.keys){
+                    errors.push({ 
+                    // field: issue.keys?.join(', '), 
+                    field: key, 
                     message: 'This field is not recognized.' 
-                })
-
+                    })
+                }
                 continue
             }
 
-            const field = issue.path?.join('.')
+            const field = issue.path?.join('.') || 'unknown'
+            const message = issue.message || 'Invalid input'
 
             if (issue.code === 'invalid_type') {
                 invalidTypeFields.add(field)
                 
                 errors.push({ 
                     field,
-                    message: issue.message 
+                    message
                 })
 
                 continue
