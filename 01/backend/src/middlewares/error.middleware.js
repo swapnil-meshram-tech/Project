@@ -9,7 +9,7 @@ const notFoundHandler = (req, res, next) =>{
 
 const jsonSyntaxErrorHandler = (err, req, res, next) =>{
     
-    const isJsonMalformed = err.status === 400 && err.type === 'entity.parse.failed'
+    const isJsonMalformed = (err.status === 400 || err.statusCode === 400) && err.type === 'entity.parse.failed'
     
     if (isJsonMalformed) {
         const appError = new AppError('Invalid JSON format in request body.', 400)
@@ -102,7 +102,6 @@ const zodErrorHandler = (err, req, res, next) =>{
         }
 
         console.log(errors);
-        
 
         const appError = new AppError('Validation failed.', 400, errors)
         

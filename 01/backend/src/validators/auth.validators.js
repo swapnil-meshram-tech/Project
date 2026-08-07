@@ -12,7 +12,11 @@ const TEMPORARY_DOMAINS = new Set([
 const authSchema = {
     register: z.object({
         username: z
-            .string({ required_error: 'Username is required' })
+            .string({ error: 'Username must be a string.' })
+            .min(1, {
+                message:'Username is required.', 
+                abort: true
+            })
             .min(6, 'Username must be between 6 and 30 characters.')
             .max(30, 'Username must be between 6 and 30 characters.')
             
@@ -21,7 +25,11 @@ const authSchema = {
             .regex(/^[a-z0-9_-]+$/, 'Username can only contain lowercase letters, numbers, underscores and hyphens.'),
 
         email: z
-            .string({ required_error: 'Email is required' })
+            .string({ error: 'Email must be a string.' })
+            .min(1, {
+                message:'Email is required.', 
+                abort: true
+            })
             .min(6, 'Email address is too short.')
             .max(255, 'Email address cannot exceed 255 characters.')
 
@@ -45,7 +53,11 @@ const authSchema = {
             // .transform(val => val.toLowerCase()),
 
         password: z
-            .string({ required_error: 'Password is required' })
+            .string({ error: 'Password must be a string.' })
+            .min(1, {
+                message:'Password is required.', 
+                abort: true
+            })
             .min(8, 'Password must be between 8 and 64 characters.')
             .max(64, 'Password must be between 8 and 64 characters.')
             
@@ -60,39 +72,87 @@ const authSchema = {
             .regex(/[^a-zA-Z0-9\s]/, 'Password must contain at least one special character.'),
         
         confirmPassword: z
-            .string({ required_error: 'Confirm password is required' })
+            .string({ error: 'Confirm password must be a string.' })
+            .min(1, {
+                message:'Confirm password is required.', 
+                abort: true
+            })
     })
     .strict()
-    .refine((data) => data.username !== data.email, {
-        message: 'Username cannot be the same as email address.',
-        path: ['username']  
-    })
-    .refine((data) => !data.password.toLowerCase().includes(data.username.toLowerCase()), {
-        message: 'Password cannot contain username.',
-        path: ['password']
-    })
+    // .refine((data) => data.username !== data.email, {
+    //     message: 'Username cannot be the same as email address.',
+    //     path: ['username']  
+    // })
+    // .refine((data) => !data.password.toLowerCase().includes(data.username.toLowerCase()), {
+    //     message: 'Password cannot contain username.',
+    //     path: ['password']
+    // })
     .refine((data) => {
        const prefix = data.email.split('@')[0].toLowerCase()
        return prefix.length < 3 || !data.password.toLowerCase().includes(prefix)
-       }, {
-       message: 'Password cannot contain email address.',
-       path: ['password']
+    }, {
+        path: ['password'],
+        message: 'Password cannot contain email address.'
     })
-    .refine((data) => data.password === data.confirmPassword, {
-        message: 'Passwords do not match.',
-        path: ['confirmPassword']
+    // .refine((data) => data.password === data.confirmPassword, {
+    //     message: 'Passwords do not match.',
+    //     path: ['confirmPassword']
+    // })
+
+    .superRefine((data, ctx) =>{
+        if(!data.username || !data.email || !data.password || !data.confirmPassword) return 
+
+        if(data.username === data.email){
+            ctx.addIssue({
+                code: 'custom',
+                path: ['username'],
+                message: 'Username cannot be same as email address.'
+            })
+        }
+
+        // if(data.password.toLowerCase().includes(data.email)){
+        //     ctx.addIssue({
+        //         code: 'custom',
+        //         path: ['Password'],
+        //         message: 'Password cannot contain email.'
+        //     })
+        // }
+        
+        if(data.password.toLowerCase().includes(data.username)){
+            ctx.addIssue({
+                code: 'custom',
+                path: ['Password'],
+                message: 'Password cannot contain username.'
+            })
+        }
+
+        if(data.password !== data.confirmPassword){
+            ctx.addIssue({
+                code: 'custom',
+                path: ['confirmPassword'],
+                message: 'Passwords do not match.'
+            })
+        }
     }),
 
     login: z.object({
         identifier: z
-            .string({ required_error: 'Email is required' })
+            .string({ error: 'Identifier must be a string.' })
+            .min(1, {
+                message:'Identifier is required.', 
+                abort: true
+            })
             .min(5, 'Invalid credentials.') 
             .max(255, 'Invalid credentials.')
             .regex(/^[^A-Z]+$/, 'Invalid credentials.')
             .regex(/^\S+$/, 'Invalid credentials.'),
             
         password: z
-            .string({ required_error: 'Password is required' })
+            .string({ error: 'Password must be a string.' })
+            .min(1, {
+                message:'Password is required.', 
+                abort: true
+            })
             .min(8, 'Invalid credentials.')
             .max(64, 'Invalid credentials.'),
     })

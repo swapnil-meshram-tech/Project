@@ -1,5 +1,15 @@
 const { AppError } = require('../utils/apperror.utils')
 
+const contentTypeGuard = (req, res, next) => {
+    if (["POST", "PUT", "PATCH"].includes(req.method) && !req.is("application/json")) {
+        const error = new AppError('Request body cannot be empty.', 400)
+            
+        return next(error)
+    }
+
+    next()
+}
+
 const rejectEmptyRequestBody = (req, res, next) =>{
     
     // if (req.headers['content-length'] === '0') {
@@ -15,7 +25,7 @@ const rejectEmptyRequestBody = (req, res, next) =>{
         return false
     }            
 
-    if (!req.body || !typeof req.body === 'object' || !hasAnyProperty(req.body)) {
+    if (!req.body || typeof req.body !== 'object' || !hasAnyProperty(req.body)) {
         const error = new AppError('Request body cannot be empty.', 400)
             
         return next(error)
