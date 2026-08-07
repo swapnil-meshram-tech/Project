@@ -24,7 +24,7 @@ const authSchema = {
             .regex(/^[a-z]/, 'Username must start with lowercase letter.')
             .regex(/^[a-z0-9_.-]+$/, 'Username can only contain lowercase letters, numbers, underscores and hyphens.')
             .regex(/[a-z0-9]$/, 'Username cannot end with a special character.')
-            .regex(/^(?!.*[-_]{2}).+$/, 'No consecutive special characters allowed.'),
+            .regex(/^(?!.*[_.-]{2}).+$/, 'No consecutive special characters allowed.'),
 
         email: z
             .string({ error: 'Email is required and must be a string.' })
