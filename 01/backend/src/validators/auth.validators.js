@@ -21,8 +21,9 @@ const authSchema = {
             .max(30, 'Username must be between 6 and 30 characters.')
             
             .regex(/^\S*$/, 'Username cannot contain spaces, tabs or new lines.')
+            // .regex(/^[^A-Z]*$/, 'Username must be lowercase only.')
             .regex(/^[a-z]/, 'Username must start with lowercase letter.')
-            .regex(/^[a-z0-9_.-]+$/, 'Username can only contain lowercase letters, numbers, underscores and hyphens.')
+            .regex(/^[a-z0-9_.-]+$/, 'Username can only contain lowercase letters, numbers, underscores, dots and hyphens.')
             .regex(/[a-z0-9]$/, 'Username cannot end with a special character.')
             .regex(/^(?!.*[_.-]{2}).+$/, 'No consecutive special characters allowed.'),
 
@@ -103,13 +104,45 @@ const authSchema = {
 
     .superRefine((data, ctx) =>{
         if(!data.username || !data.email || !data.password || !data.confirmPassword) return 
+        // console.log(data.email.split('@')[1])
+        // console.log(data.email.split('@')[1].split('.')[1])
 
-        if(data.username === data.email){
-            ctx.addIssue({
-                code: 'custom',
-                path: ['username'],
-                message: 'Username cannot be same as email address.'
-            })
+        const username = data.username
+        const email = data.email
+        const password = data.password
+        
+        const [localPart, domain] = email.split('@')
+
+            // if(username === email){
+            //     ctx.addIssue({
+            //         code: 'custom',
+            //         path: ['username'],
+            //         message: 'Username cannot be same as email address.'
+            //     })
+            // }
+
+        // if(data.username === `${localPart}${domain}` ||data.username === `${localPart}${domain.split('.')[0]}`){
+        //     ctx.addIssue({
+        //         code: 'custom',
+        //         path: ['username'],
+        //         message: 'Username cannot mimic an email address.'
+        //     })
+        // }
+
+        if(domain){
+            // const domainPart = domain.split('.')
+            const cleanDomain = domain.replace(/\./g, '')
+            const cleanUsername = username.replace(/\./g, '')
+            console.log(cleanDomain);
+            console.log(cleanUsername);
+            
+            if(username === domain || cleanUsername.includes(cleanDomain) || cleanDomain.includes(cleanUsername)) {
+                ctx.addIssue({
+                    code: 'custom',
+                    path: ['username'],
+                    message: 'Username cannot mimic an email address.'
+                })
+            }
         }
 
         // if(data.password.toLowerCase().includes(data.email)){
