@@ -20,8 +20,8 @@ const authSchema = {
             .min(6, 'Username must be between 6 and 30 characters.')
             .max(30, 'Username must be between 6 and 30 characters.')
             
-            .regex(/^\S*$/, 'Username cannot contain spaces, tabs or new lines.')
             // .regex(/^[^A-Z]*$/, 'Username must be lowercase only.')
+            .regex(/^\S*$/, 'Username cannot contain spaces, tabs or new lines.')
             .regex(/^[a-z]/, 'Username must start with lowercase letter.')
             .regex(/^[a-z0-9_.-]+$/, 'Username can only contain lowercase letters, numbers, underscores, dots and hyphens.')
             .regex(/[a-z0-9]$/, 'Username cannot end with a special character.')
@@ -184,19 +184,37 @@ const authSchema = {
                 message:'Identifier is required.', 
                 abort: true
             })
-            .min(5, 'Invalid credentials.') 
-            .max(255, 'Invalid credentials.')
-            .regex(/^[^A-Z]+$/, 'Invalid credentials.')
-            .regex(/^\S+$/, 'Invalid credentials.'),
-            
+            .min(6, {
+                message:'Invalid credentials.', 
+                abort: true
+            })
+            .max(255, {
+                message:'Invalid credentials.', 
+                abort: true
+            })
+            .regex(/^\S*$/, {
+                message:'Invalid credentials.', 
+                abort: true
+            })
+            .regex(/^[^A-Z]*$/, {
+                message:'Invalid credentials.', 
+                abort: true
+            }),
+
         password: z
             .string({ error: 'Password is required and must be a string.' })
             .min(1, {
                 message:'Password is required.', 
                 abort: true
             })
-            .min(8, 'Invalid credentials.')
-            .max(64, 'Invalid credentials.'),
+            .min(8, {
+                message:'Invalid credentials.', 
+                abort: true
+            })
+            .max(64, {
+                message:'Invalid credentials. 64', 
+                abort: true
+            }),
     })
     .strict()
 }

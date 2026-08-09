@@ -69,8 +69,8 @@ const register = async (req, res, next) =>{
 
 const login = async (req, res, next) =>{
     try{
-        const { username, email, password } = req.body
-        const identifier = username || email
+        const { identifier, password } = req.body
+        // const identifier = username || email
         
         // ^ take both at time username,email
         // const identifier = req.body?.username || req.body?.email
