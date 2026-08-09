@@ -82,21 +82,13 @@ const authSchema = {
             })
     })
     .strict()
-    // .refine((data) => data.username !== data.email, {
-    //     message: 'Username cannot be the same as email address.',
-    //     path: ['username']  
+    // .refine((data) => {
+    //    const prefix = data.email.split('@')[0].toLowerCase()
+    //    return prefix.length < 3 || !data.password.toLowerCase().includes(prefix)
+    // }, {
+    //     path: ['password'],
+    //     message: 'Password cannot contain email address.'
     // })
-    // .refine((data) => !data.password.toLowerCase().includes(data.username.toLowerCase()), {
-    //     message: 'Password cannot contain username.',
-    //     path: ['password']
-    // })
-    .refine((data) => {
-       const prefix = data.email.split('@')[0].toLowerCase()
-       return prefix.length < 3 || !data.password.toLowerCase().includes(prefix)
-    }, {
-        path: ['password'],
-        message: 'Password cannot contain email address.'
-    })
     // .refine((data) => data.password === data.confirmPassword, {
     //     message: 'Passwords do not match.',
     //     path: ['confirmPassword']
@@ -104,64 +96,79 @@ const authSchema = {
 
     .superRefine((data, ctx) =>{
         if(!data.username || !data.email || !data.password || !data.confirmPassword) return 
-        // console.log(data.email.split('@')[1])
-        // console.log(data.email.split('@')[1].split('.')[1])
+  
+        const username = data.username.toLowerCase()
+        const email = data.email.toLowerCase()
+        const password = data.password.toLowerCase()
+        const confirmPassword = data.confirmPassword.toLowerCase()
 
-        const username = data.username
-        const email = data.email
-        const password = data.password
-        
         const [localPart, domain] = email.split('@')
 
-            // if(username === email){
-            //     ctx.addIssue({
-            //         code: 'custom',
-            //         path: ['username'],
-            //         message: 'Username cannot be same as email address.'
-            //     })
-            // }
-
-        // if(data.username === `${localPart}${domain}` ||data.username === `${localPart}${domain.split('.')[0]}`){
+        // if(username === email){
         //     ctx.addIssue({
         //         code: 'custom',
         //         path: ['username'],
-        //         message: 'Username cannot mimic an email address.'
+        //         message: 'Username cannot be same as email address.'
+        //     })
+        // }
+
+        // if(username.includes(localPart)){
+        //     ctx.addIssue({
+        //         code: 'custom',
+        //         path: ['username'],
+        //         message: 'Username cannot be same as email address.'
         //     })
         // }
 
         if(domain){
-            // const domainPart = domain.split('.')
-            const cleanDomain = domain.replace(/\./g, '')
             const cleanUsername = username.replace(/\./g, '')
-            console.log(cleanDomain);
-            console.log(cleanUsername);
+            const domainParts = domain.split('.')
+
+            const containsDomainPart = domainParts.find((part) => 
+                (part.length >= 3) && cleanUsername.includes(part))
             
-            if(username === domain || cleanUsername.includes(cleanDomain) || cleanDomain.includes(cleanUsername)) {
+            if(username.includes(localPart) ||containsDomainPart) {
                 ctx.addIssue({
                     code: 'custom',
                     path: ['username'],
-                    message: 'Username cannot mimic an email address.'
+                    message: `Username cannot contain specific part from email address.`
                 })
             }
         }
-
-        // if(data.password.toLowerCase().includes(data.email)){
-        //     ctx.addIssue({
-        //         code: 'custom',
-        //         path: ['Password'],
-        //         message: 'Password cannot contain email.'
-        //     })
-        // }
         
-        if(data.password.toLowerCase().includes(data.username)){
+        if(password.includes(username)){
             ctx.addIssue({
                 code: 'custom',
-                path: ['Password'],
+                path: ['password'],
                 message: 'Password cannot contain username.'
             })
         }
 
-        if(data.password !== data.confirmPassword){
+        // if(password === email){
+        //     ctx.addIssue({
+        //         code: 'custom',
+        //         path: ['password'],
+        //         message: 'Password cannot be same as email address.'
+        //     })
+        // }
+
+        if(domain){
+            // const cleanEmail = email.replace(/\./g, '')
+            const domainParts = domain.split('.')
+
+            const containsDomainPart = domainParts.find((part) => 
+                (part.length >= 4) && password.includes(part))
+            
+            if(password.includes(localPart) || containsDomainPart) {
+                ctx.addIssue({
+                    code: 'custom',
+                    path: ['password'],
+                    message: `Password cannot contain sepecific part from email address.`
+                })
+            }
+        }
+
+        if(password !== confirmPassword){
             ctx.addIssue({
                 code: 'custom',
                 path: ['confirmPassword'],

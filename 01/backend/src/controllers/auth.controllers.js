@@ -29,7 +29,7 @@ const register = async (req, res, next) =>{
 
         if(isUserExists){
             // console.error('error: User already exists.')
-            throw new AppError('User already exists.', 409)
+            throw new AppError('User already register.', 409)
         }
 
         const user = await createUser(username, email, password)

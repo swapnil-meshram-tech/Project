@@ -24,48 +24,48 @@ const zodErrorHandler = (err, req, res, next) =>{
     
     if (err instanceof ZodError) {
         const issues = err.issues || err.errors || []
-        console.log('zodErrorHandler HIT, raw issues:', err.issues.length);
-        console.log('zodErrorHandler HIT, raw issues:', JSON.stringify(err.issues, null, 2));
-        // const errors = issues.map((issue) =>{
-        //     if(issue.code === 'unrecognized_keys'){
-        //         return {
-        //             field: issue.keys?.join(', ') || 'unknown', 
-        //             message: 'This field is not recognized.'
-        //         }
-        //     }
+        // console.log('zodErrorHandler HIT, raw issues:', err.issues.length);
+        // console.log('zodErrorHandler HIT, raw issues:', JSON.stringify(err.issues, null, 2));
+        // // const errors = issues.map((issue) =>{
+        // //     if(issue.code === 'unrecognized_keys'){
+        // //         return {
+        // //             field: issue.keys?.join(', ') || 'unknown', 
+        // //             message: 'This field is not recognized.'
+        // //         }
+        // //     }
 
-        //     if(issue.code === 'invalid_type'){
-        //         return {
-        //             field: issue.path?.join('.'), 
-        //             message: issue.message
-        //         }
-        //     }
+        // //     if(issue.code === 'invalid_type'){
+        // //         return {
+        // //             field: issue.path?.join('.'), 
+        // //             message: issue.message
+        // //         }
+        // //     }
 
-        //     return null
+        // //     return null
             
-        //     // return {
-        //     //     field: issue.path?.join('.'), 
-        //     //     message: issue.message
-        //     // }
-        // }).filter(Boolean)
+        // //     // return {
+        // //     //     field: issue.path?.join('.'), 
+        // //     //     message: issue.message
+        // //     // }
+        // // }).filter(Boolean)
 
-        // const errors = []
+        // // const errors = []
 
-        // for (const issue of issues) {
-        //     if (issue.code === 'unrecognized_keys') {
-        //         errors.push({
-        //             field: issue.keys?.join(', ') || 'unknown',
-        //             message: 'This field is not recognized.'
-        //         })
-        //         continue
-        //     }
+        // // for (const issue of issues) {
+        // //     if (issue.code === 'unrecognized_keys') {
+        // //         errors.push({
+        // //             field: issue.keys?.join(', ') || 'unknown',
+        // //             message: 'This field is not recognized.'
+        // //         })
+        // //         continue
+        // //     }
         
-        //     const field = issue.path?.join('.')
-        //     if (seen.has(field)) continue
+        // //     const field = issue.path?.join('.')
+        // //     if (seen.has(field)) continue
         
-        //     seen.add(field)
-        //     errors.push({ field, message: issue.message })
-        // }
+        // //     seen.add(field)
+        // //     errors.push({ field, message: issue.message })
+        // // }
 
         const invalidTypeFields = new Set()
         const errors = []
