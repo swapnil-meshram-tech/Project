@@ -66,7 +66,7 @@ const authSchema = {
             .regex(/^\S/, 'Password cannot start with a space.')
             .regex(/\S$/, 'Password cannot end with a space.')
             
-            .regex(/^[^\t\n]+$/, 'Password cannot contain tabs or newlines.')
+            .regex(/^[^\t\n\r]+$/, 'Password cannot contain tabs or newlines.')
             
             .regex(/[A-Z]/, 'Password must contain at least one uppercase letter.')
             .regex(/[a-z]/, 'Password must contain at least one lowercase letter.')
@@ -194,19 +194,7 @@ const authSchema = {
                 message:'Invalid credentials.', 
                 abort: true
             })
-            // .regex(/^\S*$/, {
-            //     message:'Invalid credentials.', 
-            //     abort: true
-            // })
-            // .regex(/^[^A-Z]*$/, {
-            //     message:'Invalid credentials.', 
-            //     abort: true
-            // })
-            .regex(/^[a-z][a-z0-9_.+-]*$/, {
-                message:'Invalid credentials.', 
-                abort: true
-            })
-            .regex(/[a-z0-9]$/, {
+            .regex(/^[a-z][a-z0-9]*(?:[._-][a-z0-9]+)*$/, {
                 message:'Invalid credentials.', 
                 abort: true
             }),
@@ -225,10 +213,10 @@ const authSchema = {
                 message:'Invalid credentials.', 
                 abort: true
             })
-            // .regex(/[^a-zA-Z0-9\s]/, {
-            //     message:'Invalid credentials.', 
-            //     abort: true
-            // }),
+            .regex(/^[^\s\t\n\r]+(?: +[^\s\t\n\r]+)*$/, {
+                message:'Invalid credentials.', 
+                abort: true
+            }),
     })
     .strict()
 }
