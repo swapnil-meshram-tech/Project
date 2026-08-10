@@ -118,7 +118,9 @@ const mongooseValidationErrorHandler = (err, req, res, next) =>{
     if (err.name === 'ValidationError' && err.errors) {
         const firstField = Object.keys(err.errors)[0]
         const message = err.errors[firstField]?.message || 'Inavlid input.'
-        err = new AppError(message, 400)
+        
+        appError = new AppError(message, 400)
+        return next(appError)
     }
 
     next(err)

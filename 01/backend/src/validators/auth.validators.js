@@ -39,7 +39,6 @@ const authSchema = {
             .regex(/^\S*$/, 'Email cannot contain spaces, tabs or new lines.')
             .regex(/^[^A-Z]*$/, 'Email must be lowercase only.')
             .regex(/^[a-z0-9_.+-]/, 'Email must start with a lowercase letter, number, or valid symbol.')
-            // .regex(/^[a-z0-9]/, 'Email must start with a lowercase letter, number, or valid symbol.')
             
             .refine((val) => !val.includes('..'), {
                 message: 'Email cannot contain consecutive dots.'
@@ -121,13 +120,16 @@ const authSchema = {
         // }
 
         if(domain){
-            const cleanUsername = username.replace(/\./g, '')
+            // const cleanUsername = username.replace(/\./g, '')
+            const cleanUsername = username.split('.')
             const domainParts = domain.split('.')
-
-            const containsDomainPart = domainParts.find((part) => 
-                (part.length >= 3) && cleanUsername.includes(part))
+            console.log(cleanUsername)
+            console.log(domainParts)
             
-            if(username.includes(localPart) ||containsDomainPart) {
+            const containsDomainPart = domainParts.find((part) => 
+                (part.length >= 2) && cleanUsername.includes(part))
+            
+            if(username.includes(localPart) || containsDomainPart) {
                 ctx.addIssue({
                     code: 'custom',
                     path: ['username'],
@@ -192,11 +194,19 @@ const authSchema = {
                 message:'Invalid credentials.', 
                 abort: true
             })
-            .regex(/^\S*$/, {
+            // .regex(/^\S*$/, {
+            //     message:'Invalid credentials.', 
+            //     abort: true
+            // })
+            // .regex(/^[^A-Z]*$/, {
+            //     message:'Invalid credentials.', 
+            //     abort: true
+            // })
+            .regex(/^[a-z][a-z0-9_.+-]*$/, {
                 message:'Invalid credentials.', 
                 abort: true
             })
-            .regex(/^[^A-Z]*$/, {
+            .regex(/[a-z0-9]$/, {
                 message:'Invalid credentials.', 
                 abort: true
             }),
@@ -212,9 +222,13 @@ const authSchema = {
                 abort: true
             })
             .max(64, {
-                message:'Invalid credentials. 64', 
+                message:'Invalid credentials.', 
                 abort: true
-            }),
+            })
+            // .regex(/[^a-zA-Z0-9\s]/, {
+            //     message:'Invalid credentials.', 
+            //     abort: true
+            // }),
     })
     .strict()
 }
