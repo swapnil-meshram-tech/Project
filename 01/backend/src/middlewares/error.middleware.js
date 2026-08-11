@@ -23,6 +23,16 @@ const jsonSyntaxErrorHandler = (err, req, res, next) =>{
 const zodErrorHandler = (err, req, res, next) =>{ 
     
     if (err instanceof ZodError) {
+
+        if (req.originalUrl.includes('/login')) {
+            const appError = new AppError('Invalid credentials.', 401)
+            
+            // return next(appError)
+            return res.status(401).json({
+                message: 'Invalid c'
+            })
+        }
+
         const issues = err.issues || err.errors || []
         // console.log('zodErrorHandler HIT, raw issues:', err.issues.length);
         // console.log('zodErrorHandler HIT, raw issues:', JSON.stringify(err.issues, null, 2));

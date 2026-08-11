@@ -181,9 +181,9 @@ const authSchema = {
 
     login: z.object({
         identifier: z
-            .string({ error: 'Identifier is required and must be a string.' })
+            .string({ error: 'Invalid credentials.' })
             .min(1, {
-                message:'Identifier is required.', 
+                message:'Invalid credentials.', 
                 abort: true
             })
             .min(6, {
@@ -195,14 +195,14 @@ const authSchema = {
                 abort: true
             })
             .regex(/^[a-z][a-z0-9]*(?:[._-][a-z0-9]+)*$/, {
-                message:'Invalid credentials.', 
+                message:'Invalid credentials. something', 
                 abort: true
             }),
 
         password: z
-            .string({ error: 'Password is required and must be a string.' })
+            .string({ error: 'Invalid credentials.' })
             .min(1, {
-                message:'Password is required.', 
+                message:'Invalid credentials.', 
                 abort: true
             })
             .min(8, {
@@ -213,8 +213,8 @@ const authSchema = {
                 message:'Invalid credentials.', 
                 abort: true
             })
-            .regex(/^[^\s\t\n\r]+(?: +[^\s\t\n\r]+)*$/, {
-                message:'Invalid credentials.', 
+            .regex(/^\S+(?: +\S+)*$/, {
+                message:'Invalid credentials. wrong', 
                 abort: true
             }),
     })
