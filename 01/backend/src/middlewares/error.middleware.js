@@ -2,7 +2,7 @@ const { AppError } = require('../utils/apperror.utils')
 const { ZodError } = require('zod')
 
 const notFoundHandler = (req, res, next) =>{    
-    const appError = new AppError(`Route not found - ${req.originalUrl}.`, 404)
+    const appError = new AppError(`Route not found.`, 404)
     
     next(appError)
 }
@@ -12,14 +12,9 @@ const jsonSyntaxErrorHandler = (err, req, res, next) =>{
     
     if (isJsonMalformed) {
 
-        if (req.originalUrl.includes('/login')) {
-             const appError = new AppError('Invalid credentials.', 401)
-            
+        if (req.path === '/api/v1/auth/login') {
+            const appError = new AppError('Invalid credentials.', 401) 
             return next(appError)
-            
-            // return res.status(401).json({
-            //     message: 'Invalid c'
-            // })
         }
 
         const appError = new AppError('Invalid JSON format in request body.', 400)
