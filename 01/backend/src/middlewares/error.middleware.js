@@ -8,12 +8,21 @@ const notFoundHandler = (req, res, next) =>{
 }
 
 const jsonSyntaxErrorHandler = (err, req, res, next) =>{
-    
     const isJsonMalformed = (err.status === 400 || err.statusCode === 400) && err.type === 'entity.parse.failed'
     
     if (isJsonMalformed) {
-        const appError = new AppError('Invalid JSON format in request body.', 400)
 
+        if (req.originalUrl.includes('/login')) {
+             const appError = new AppError('Invalid credentials.', 401)
+            
+            return next(appError)
+            
+            // return res.status(401).json({
+            //     message: 'Invalid c'
+            // })
+        }
+
+        const appError = new AppError('Invalid JSON format in request body.', 400)
         return next(appError)
     }
 
@@ -27,10 +36,11 @@ const zodErrorHandler = (err, req, res, next) =>{
         if (req.originalUrl.includes('/login')) {
             const appError = new AppError('Invalid credentials.', 401)
             
-            // return next(appError)
-            return res.status(401).json({
-                message: 'Invalid c'
-            })
+            return next(appError)
+
+            // return res.status(401).json({
+            //     message: 'Invalid c'
+            // })
         }
 
         const issues = err.issues || err.errors || []
