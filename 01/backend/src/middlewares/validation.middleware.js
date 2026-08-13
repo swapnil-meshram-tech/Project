@@ -1,50 +1,45 @@
+const { object } = require('zod')
 const { AppError } = require('../utils/apperror.utils')
 
 const contentTypeGuard = (req, res, next) => {
-    if (["POST", "PUT", "PATCH"].includes(req.method) && !req.is("application/json")) {
+    const isMethod = ['POST', 'PUT', 'PATCH'].includes(req.method)
+    const isJson = req.is('application/json')
 
-        // if (req.originalUrl.includes('/login')) {
-        //      const appError = new AppError('Invalid credentials.', 401)
-            
-        //     // return next(appError)
-            
-        //     return res.status(401).json({
-        //         message: 'Invalid c'
-        //     })
-        // }
-
-        const error = new AppError('Request body cannot be empty.', 400)
-            
+    if (isMethod && !isJson) {
+        const error = new AppError('Content-Type must be application/json.', 415)    
+        
         return next(error)
     }
 
     next()
 }
 
-const rejectEmptyRequestBody = (req, res, next) =>{
+const hasAnyProperty = (obj) => {
+    for (const key in obj) {
+        if (Object.hasOwn(obj, key)) return true
+    }
 
-    const hasAnyProperty = (obj) => {
-        for (const key in obj) {
-            return true
-         }
-        return false
-    }            
+    return false
+} 
 
-    if (!req.body || (typeof req.body !== 'object') || !hasAnyProperty(req.body)) {
+const requireValidObjectBody = (req, res, next) => {
+    const isBodyMalformed = !req.body || (typeof req.body !== 'object') || Array.isArray(req.body)
+    const isEmptyObject = !isBodyMalformed && !hasAnyProperty(req.body)
+
+    if (isBodyMalformed || isEmptyObject) {
+        console.log(req.path);
+        console.log(req.originalUrl);
         
-        if (req.originalUrl.includes('/login')) {
-             const appError = new AppError('Invalid credentials.', 401)
+        if (req.originalUrl === '/api/v1/auth/login') {
+             const appError = new AppError(' r Invalid credentials.', 401)
             
-            // return next(appError)
-            
-            return res.status(401).json({
-                message: 'Invalid c'
-            })
+            return next(appError)
         }
 
-        const error = new AppError('Request body cannot be empty.', 400)
-            
-        return next(error)
+        const message = isBodyMalformed ? 'r Request body must be a valid JSON object.' : 'Request body cannot be empty.'
+
+        const appError = new AppError(message, 400)
+        return next(appError)
     }
 
     next()
@@ -61,6 +56,7 @@ const validateSchema = (schema) => (req, res, next) => {
 }
 
 module.exports = {
-    rejectEmptyRequestBody,
+    contentTypeGuard,
+    requireValidObjectBody,
     validateSchema
 }

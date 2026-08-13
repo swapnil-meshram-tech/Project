@@ -1,7 +1,7 @@
 const { Router } = require('express')
 // const { registerLimiter  } = require('../middlewares/ratelimiter.middleware')
 const { verifyAccessToken, verifyRefreshToken, verifyActiveUser, verifyActiveSession } = require('../middlewares/auth.middleware')
-const { rejectEmptyRequestBody, validateSchema } = require('../middlewares/validation.middleware')
+const { requireValidObjectBody, validateSchema } = require('../middlewares/validation.middleware')
 const { authSchema } = require('../validators/auth.validators')
 const { register, login, logout, logoutAll, refreshToken } = require('../controllers/auth.controllers')
 const { sendMessage, getChatHistory } = require('../controllers/chat.controllers')
@@ -10,12 +10,12 @@ const authRouter = Router()
 
 // authRouter.post('/register', registerLimiter, register)
 authRouter.post('/register', 
-    rejectEmptyRequestBody, 
+    // requireValidObjectBody(''), 
     validateSchema(authSchema.register), 
     register)
     
 authRouter.post('/login', 
-    rejectEmptyRequestBody, 
+    // rejectEmptyRequestBody, 
     validateSchema(authSchema.login), 
     login)
 

@@ -7,17 +7,17 @@ const notFoundHandler = (req, res, next) =>{
     next(appError)
 }
 
-const jsonSyntaxErrorHandler = (err, req, res, next) =>{
-    const isJsonMalformed = (err.status === 400 || err.statusCode === 400) && err.type === 'entity.parse.failed'
+const bodyParserErrorHandler = (err, req, res, next) =>{
+    const isPayloadMalformed = (err.status === 400 || err.statusCode === 400) && err.type === 'entity.parse.failed'
     
-    if (isJsonMalformed) {
-
-        if (req.path === '/api/v1/auth/login') {
-            const appError = new AppError('Invalid credentials.', 401) 
+    if (isPayloadMalformed) {
+        
+        if (req.originalUrl === '/api/v1/auth/login') {
+            const appError = new AppError('j Invalid credentials.', 401) 
             return next(appError)
         }
 
-        const appError = new AppError('Invalid JSON format in request body.', 400)
+        const appError = new AppError('j Request body must be valid a JSON object.', 400)
         return next(appError)
     }
 
@@ -98,7 +98,7 @@ const zodErrorHandler = (err, req, res, next) =>{
             }
 
             const field = issue.path?.join('.') || 'unknown'
-            const message = issue.message || 'Invalid input'
+            const message = (field === 'unknown') ? 'Invalid input' : issue.message
 
             if (issue.code === 'invalid_type') {
                 invalidTypeFields.add(field)
@@ -163,7 +163,7 @@ const globalErrorHandler = (err, req, res, next) =>{
 
 module.exports = {
     notFoundHandler,
-    jsonSyntaxErrorHandler,
+    bodyParserErrorHandler,
     zodErrorHandler,
     // mongooseValidationErrorHandler,
     globalErrorHandler,
