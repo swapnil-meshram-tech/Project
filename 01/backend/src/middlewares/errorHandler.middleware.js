@@ -1,43 +1,38 @@
 const { AppError } = require('../utils/apperror.utils')
 const { ZodError } = require('zod')
 
-const notFoundHandler = (req, res, next) =>{    
+const notFoundHandler = (req, res, next) =>{  
+    // console.log(err);
+    // console.log(req);
+      
     const appError = new AppError(`Route not found.`, 404)
     
     next(appError)
 }
 
-const bodyParserErrorHandler = (err, req, res, next) =>{
-    const isPayloadMalformed = (err.status === 400 || err.statusCode === 400) && err.type === 'entity.parse.failed'
+const loginErrorOptions = {
+    message: 'b Something went wrong.',
+    status: 401
+}
+
+const bodyParserErrorHandler = (errorOptions = {}) => {
+    return (err, req, res, next) => {
+        const isPayloadMalformed = (err.status === 400 || err.statusCode === 400) && err?.type === 'entity.parse.failed'
     
-    if (isPayloadMalformed) {
-        
-        if (req.originalUrl === '/api/v1/auth/login') {
-            const appError = new AppError('j Invalid credentials.', 401) 
+        if (isPayloadMalformed) {
+            const message = errorOptions.message || 'b Request body must be a valid JSON object.'
+            const status = errorOptions.status || 400
+           
+            const appError = new AppError(message, status) 
             return next(appError)
         }
 
-        const appError = new AppError('j Request body must be valid a JSON object.', 400)
-        return next(appError)
+        next(err)
     }
-
-    next(err)
 }
 
 const zodErrorHandler = (err, req, res, next) =>{ 
-    
     if (err instanceof ZodError) {
-
-        if (req.originalUrl.includes('/login')) {
-            const appError = new AppError('Invalid credentials.', 401)
-            
-            return next(appError)
-
-            // return res.status(401).json({
-            //     message: 'Invalid c'
-            // })
-        }
-
         const issues = err.issues || err.errors || []
         // console.log('zodErrorHandler HIT, raw issues:', err.issues.length);
         // console.log('zodErrorHandler HIT, raw issues:', JSON.stringify(err.issues, null, 2));
@@ -122,7 +117,6 @@ const zodErrorHandler = (err, req, res, next) =>{
         console.log(errors);
 
         const appError = new AppError('Validation failed.', 400, errors)
-        
         return next(appError)
     }
 
@@ -162,6 +156,7 @@ const globalErrorHandler = (err, req, res, next) =>{
 }
 
 module.exports = {
+    loginErrorOptions,
     notFoundHandler,
     bodyParserErrorHandler,
     zodErrorHandler,

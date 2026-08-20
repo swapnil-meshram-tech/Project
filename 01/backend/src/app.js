@@ -7,8 +7,9 @@ const config = require('../src/configs/env')
 const authRouter = require('./routes/auth.routes')
 const adminRouter = require('./routes/admin.routes')
 const userRouter = require('./routes/user.routes')
-const { notFoundHandler, bodyParserErrorHandler, zodErrorHandler, mongooseValidationErrorHandler, globalErrorHandler } = require('./middlewares/error.middleware')
-const { contentTypeGuard } = require('./middlewares/validation.middleware')
+const { notFoundHandler, bodyParserErrorHandler, zodErrorHandler, mongooseValidationErrorHandler, globalErrorHandler } = require('./middlewares/errorHandler.middleware')
+const { requireJsonContentType, requireValidObjectBody } = require('./middlewares/securityGuard.middleware')
+// const { contentTypeGuard } = require('./middlewares/validation.middleware')
 const { apiLimiter, authLimiter } = require('./middlewares/ratelimiter.middleware')
 const mongoSanitize = require('express-mongo-sanitize')
 // const compress = require('./middlewares/compression.middleware')
@@ -32,14 +33,17 @@ app.use(cors({
 
 app.use(morgan('dev'))
 
-app.use(contentTypeGuard)
+// app.use(contentTypeGuard)
 
 app.use(express.json({ limit: '10kb' }))
 app.use(express.urlencoded({ limit: '10kb', extended: true }))
 
+// app.use(bodyParserErrorHandler)
+
 app.use(cookieParser())
 
-// app.use(bodyParserErrorHandler  )
+// app.use(requireJsonContentType)
+// app.use(requireValidObjectBody)
 
 // app.use(mongoSanitize({
 //   allowDots: false,        // strip keys with dots (default: false = strip them)
@@ -71,7 +75,7 @@ app.use('/api/v1/user', userRouter)
 
 
 app.use(notFoundHandler)
-// app.use(zodErrorHandler)
+app.use(zodErrorHandler)
 // app.use(mongooseValidationErrorHandler)
 app.use(globalErrorHandler)
 

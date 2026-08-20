@@ -1,7 +1,9 @@
 const { Router } = require('express')
 // const { registerLimiter  } = require('../middlewares/ratelimiter.middleware')
 const { verifyAccessToken, verifyRefreshToken, verifyActiveUser, verifyActiveSession } = require('../middlewares/auth.middleware')
-const { requireValidObjectBody, validateSchema } = require('../middlewares/validation.middleware')
+const { requireJsonContentType, requireValidObjectBody } = require('../middlewares/securityGuard.middleware')
+const { bodyParserErrorHandler, loginErrorOptions  } = require('../middlewares/errorHandler.middleware')
+const { validateSchema } = require('../middlewares/validation.middleware')
 const { authSchema } = require('../validators/auth.validators')
 const { register, login, logout, logoutAll, refreshToken } = require('../controllers/auth.controllers')
 const { sendMessage, getChatHistory } = require('../controllers/chat.controllers')
@@ -10,12 +12,16 @@ const authRouter = Router()
 
 // authRouter.post('/register', registerLimiter, register)
 authRouter.post('/register', 
-    // requireValidObjectBody(''), 
+    requireJsonContentType(), 
+    requireValidObjectBody(),
+    bodyParserErrorHandler(),
     validateSchema(authSchema.register), 
     register)
     
 authRouter.post('/login', 
-    // rejectEmptyRequestBody, 
+    requireJsonContentType(loginErrorOptions), 
+    requireValidObjectBody(loginErrorOptions),
+    bodyParserErrorHandler(loginErrorOptions),
     validateSchema(authSchema.login), 
     login)
 
