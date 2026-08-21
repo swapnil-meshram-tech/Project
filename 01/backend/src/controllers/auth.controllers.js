@@ -4,6 +4,7 @@ const { createSession, findActiveSessionIds, deleteSession, deleteAllSessions, r
 const { generateAccessToken, generateRefreshToken } = require('../utils/jwt.utils')
 const { tokenBlacklisting } = require('../utils/blacklist.utils')
 const { AppError } = require('../utils/apperror.utils.js')
+const { generateAndSendOtp } = require('../services/otp.services.js')
 
 const register = async (req, res, next) =>{
     try{
@@ -253,6 +254,58 @@ const refreshToken = async (req, res, next) => {
         })
         
     } catch (err) {
+        next(err)
+    }
+}
+
+const generateOtp = async(req, res, next) => {
+    try {
+        const { email } = req.body
+
+        const otp = await generateAndSendOtp(email)
+
+        if(!otp){
+            return res.status(400).json({
+                success: false,
+                message: 'Otp unable to generate.',
+                otp
+            }) 
+        }
+
+        return res.status(200).json({
+            success: true,
+            message: 'Otp send to your email.',
+            otp
+        })
+
+    } catch(err){
+
+        next(err)
+    }
+}
+
+const verifyOtp = async(req, res, next) => {
+    try {
+        const { email, otp } = req.body
+
+        const checkOtp = await verifyOtpofEmail(email, otp)
+
+        if(!checkOtp){
+            return res.status(200).json({
+                success: false,
+                message: 'Otp does not match.',
+            })
+        }
+
+        return res.status(200).json({
+            success: true,
+            message: 'Otp verified successfully.',
+            otp,
+            checkOtp
+        })
+
+    } catch(err){
+
         next(err)
     }
 }
