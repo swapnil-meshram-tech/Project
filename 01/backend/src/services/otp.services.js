@@ -1,5 +1,6 @@
 const { generateOtp, hashOtp } = require('../utils/otp.utils')
-const { createOtp } = require('../repositories/otp.repository')
+const { createOtp, findOtp } = require('../repositories/otp.repository')
+const { AppError } = require('../utils/apperror.utils.js')
 
 const generateAndSendOtp = async (email) => {
     const rawOtp = generateOtp()
@@ -17,7 +18,11 @@ const verifyOtpofEmail = async (email, otp) => {
 
     const checkOtp = await findOtp(email, hashedOtp)
     console.log(checkOtp)
-    
+
+    if(!checkOtp){
+        throw new AppError('Otp dont match.', 401)
+    }
+
     return checkOtp
 }
 

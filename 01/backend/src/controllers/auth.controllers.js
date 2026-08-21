@@ -4,7 +4,7 @@ const { createSession, findActiveSessionIds, deleteSession, deleteAllSessions, r
 const { generateAccessToken, generateRefreshToken } = require('../utils/jwt.utils')
 const { tokenBlacklisting } = require('../utils/blacklist.utils')
 const { AppError } = require('../utils/apperror.utils.js')
-const { generateAndSendOtp } = require('../services/otp.services.js')
+const { generateAndSendOtp, verifyOtpofEmail } = require('../services/otp.services.js')
 
 const register = async (req, res, next) =>{
     try{
@@ -262,14 +262,14 @@ const generateOtp = async(req, res, next) => {
     try {
         const { email } = req.body
 
+        if(!email){
+            throw new AppError('Email is required.', 400)
+        }
+
         const otp = await generateAndSendOtp(email)
 
         if(!otp){
-            return res.status(400).json({
-                success: false,
-                message: 'Otp unable to generate.',
-                otp
-            }) 
+            throw new AppError('Otp generation failed.', 400)
         }
 
         return res.status(200).json({
@@ -290,12 +290,12 @@ const verifyOtp = async(req, res, next) => {
 
         const checkOtp = await verifyOtpofEmail(email, otp)
 
-        if(!checkOtp){
-            return res.status(200).json({
-                success: false,
-                message: 'Otp does not match.',
-            })
-        }
+        // if(!checkOtp){
+        //     return res.status(200).json({
+        //         success: false,
+        //         message: 'Otp does not match.',
+        //     })
+        // }
 
         return res.status(200).json({
             success: true,
@@ -316,6 +316,9 @@ module.exports = {
     logout,
     logoutAll,
     refreshToken,
+
+    generateOtp,
+    verifyOtp
     // profile,
 }
 

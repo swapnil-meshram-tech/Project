@@ -18,5 +18,5 @@ const findOtp = async (email, hashedOtp) => {
 
 module.exports = {
     createOtp,
-    
+    findOtp 
 }
