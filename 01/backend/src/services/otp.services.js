@@ -1,5 +1,6 @@
 const { generateOtp, hashOtp } = require('../utils/otp.utils')
 const { createOtp, findOtp } = require('../repositories/otp.repository')
+const { sendOtpToEmail } = require('../services/email.services.js')
 const { AppError } = require('../utils/apperror.utils.js')
 
 const generateAndSendOtp = async (email) => {
@@ -9,6 +10,8 @@ const generateAndSendOtp = async (email) => {
 
     const otpdata = await createOtp(email, hashedOtp, otpExpiresAt)
     console.log(otpdata)
+
+    await sendOtpToEmail(email, rawOtp)
 
     return rawOtp
 }
