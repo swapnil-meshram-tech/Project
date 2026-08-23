@@ -5,7 +5,7 @@ const { requireJsonContentType, requireValidObjectBody } = require('../middlewar
 const { bodyParserErrorHandler, loginErrorOptions  } = require('../middlewares/errorHandler.middleware')
 const { validateSchema } = require('../middlewares/validation.middleware')
 const { authSchema } = require('../validators/auth.validators')
-const { register, login, logout, logoutAll, refreshToken, generateOtp, verifyOtp } = require('../controllers/auth.controllers')
+const { register, login, logout, logoutAll, refreshToken, sendOtp, verifyOtp } = require('../controllers/auth.controllers')
 const { sendMessage, getChatHistory } = require('../controllers/chat.controllers')
 
 const authRouter = Router()
@@ -33,7 +33,7 @@ authRouter.post('/refresh-token', verifyRefreshToken, verifyActiveSession, refre
 authRouter.post('/chat', verifyAccessToken, sendMessage)
 authRouter.get('/chat/history', verifyAccessToken, getChatHistory)
 
-authRouter.post('/generate-otp', generateOtp)
+authRouter.post('/send-otp', sendOtp)
 authRouter.post('/verify-otp', verifyOtp)
 
 // authRouter.post('/testing',verifyRefreshToken, verifyActiveSession, refreshToken)

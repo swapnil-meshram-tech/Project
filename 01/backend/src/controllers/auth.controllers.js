@@ -258,16 +258,17 @@ const refreshToken = async (req, res, next) => {
     }
 }
 
-const generateOtp = async(req, res, next) => {
+const sendOtp = async(req, res, next) => {
     try {
         const { email } = req.body
-
+        
         if(!email){
             throw new AppError('Email is required.', 400)
         }
-
+        
         const otp = await generateAndSendOtp(email)
-
+        
+        console.log('Testing: ', email);
         if(!otp){
             throw new AppError('Otp generation failed.', 400)
         }
@@ -317,7 +318,7 @@ module.exports = {
     logoutAll,
     refreshToken,
 
-    generateOtp,
+    sendOtp,
     verifyOtp
     // profile,
 }

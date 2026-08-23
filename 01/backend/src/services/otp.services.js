@@ -3,10 +3,13 @@ const { createOtp, findOtp } = require('../repositories/otp.repository')
 const { sendOtpToEmail } = require('../services/email.services.js')
 const { AppError } = require('../utils/apperror.utils.js')
 
+const OTP_EXPIRY_DURATION = 2 * 60 * 1000
+
 const generateAndSendOtp = async (email) => {
     const rawOtp = generateOtp()
     const hashedOtp = hashOtp(rawOtp)
-    const otpExpiresAt = Date.now() + 5 * 60 * 1000
+    const otpExpiresAt = Date.now() + OTP_EXPIRY_DURATION
+    console.log('Testing: ', otpExpiresAt);
 
     const otpdata = await createOtp(email, hashedOtp, otpExpiresAt)
     console.log(otpdata)
