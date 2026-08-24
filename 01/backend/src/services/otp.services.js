@@ -1,22 +1,28 @@
 const { generateOtp, hashOtp } = require('../utils/otp.utils')
-const { createOtp, findOtp } = require('../repositories/otp.repository')
+const { storeOtp, findOtp } = require('../repositories/otp.repository')
 const { sendOtpToEmail } = require('../services/email.services.js')
 const { AppError } = require('../utils/apperror.utils.js')
 
 const OTP_EXPIRY_DURATION = 2 * 60 * 1000
 
 const generateAndSendOtp = async (email) => {
-    const rawOtp = generateOtp()
-    const hashedOtp = hashOtp(rawOtp)
-    const otpExpiresAt = Date.now() + OTP_EXPIRY_DURATION
-    console.log('Testing: ', otpExpiresAt);
+    try { 
+        const rawOtp = generateOtp()
+        const hashedOtp = hashOtp(rawOtp, email)
+        const otpExpiresAt = Date.now() + OTP_EXPIRY_DURATION
+        
+        const otpRecord = await storeOtp(email, hashedOtp, otpExpiresAt)
+        
+        const emailResult = await sendOtpToEmail(email, rawOtp)
+        // console.log('TestinTog 2: ', otpRecord )
+        console.log('Testing 2: ',emailResult )
+    
+        return rawOtp    // no return
 
-    const otpdata = await createOtp(email, hashedOtp, otpExpiresAt)
-    console.log(otpdata)
-
-    await sendOtpToEmail(email, rawOtp)
-
-    return rawOtp
+    } catch(error) {
+        return 
+    }
+    
 }
 
 const verifyOtpofEmail = async (email, otp) => {

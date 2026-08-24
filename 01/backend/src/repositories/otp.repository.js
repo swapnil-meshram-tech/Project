@@ -1,11 +1,22 @@
 const Otp = require('../models/otp.model')
 
-const createOtp = async (email, hashedOtp, otpExpiresAt) => {
-    return Otp.create({
-        email,
-        otp: hashedOtp,
-        otpExpiresAt
-    })
+const storeOtp = async (email, hashedOtp, otpExpiresAt) => {
+    return Otp.findOneAndUpdate(
+        { email },
+        { 
+            hashedOtp,
+            otpExpiresAt,
+            attempts: 0,
+            isVerified: false,
+            verificationToken: null
+        },
+        {
+            upsert: true,
+            returnDocument: 'after',
+            setDefaultsOnInsert: true,
+            runValidators: true
+        }
+    ).exec()
 }
 
 const findOtp = async (email, hashedOtp) => {
@@ -17,6 +28,6 @@ const findOtp = async (email, hashedOtp) => {
 }
 
 module.exports = {
-    createOtp,
+    storeOtp,
     findOtp 
 }

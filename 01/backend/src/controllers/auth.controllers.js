@@ -268,20 +268,14 @@ const sendOtp = async(req, res, next) => {
         
         const otp = await generateAndSendOtp(email)
         
-        console.log('Testing: ', email);
-        if(!otp){
-            throw new AppError('Otp generation failed.', 400)
-        }
-
         return res.status(200).json({
             success: true,
-            message: 'Otp send to your email.',
+            message: 'Verification code send to your email.',
             otp
         })
 
-    } catch(err){
-
-        next(err)
+    } catch(error){
+        next(error)
     }
 }
 

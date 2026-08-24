@@ -8,10 +8,10 @@ const otpSchema = new mongoose.Schema(
             trim: true,
             required: [true, 'Email is required'],
         },
-        otp: {
+        hashedOtp: {
             type: String,
-            trim: true,
-            required: [true, 'OTP is required'],
+            required: [true, 'OTP hash is required'],
+            // select: false
         },
         attempts: {
             type: Number,
@@ -21,13 +21,14 @@ const otpSchema = new mongoose.Schema(
             type: Date,
             required: true
         },
-        verified: {
+        isVerified: {
             type: Boolean,
             default: false,
         },
         verificationToken: {
             type: String,
             default: null,
+            // select: false
         },
     },
     {
