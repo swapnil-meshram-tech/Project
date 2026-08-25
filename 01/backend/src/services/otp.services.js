@@ -5,7 +5,7 @@ const { AppError } = require('../utils/apperror.utils.js')
 
 const OTP_EXPIRY_DURATION = 2 * 60 * 1000
 
-const generateAndSendOtp = async (email) => {
+const generateAndSendOtp = async(email) => {
     try { 
         const rawOtp = generateOtp()
         const hashedOtp = hashOtp(rawOtp, email)
@@ -15,12 +15,12 @@ const generateAndSendOtp = async (email) => {
         
         const emailResult = await sendOtpToEmail(email, rawOtp)
         // console.log('TestinTog 2: ', otpRecord )
-        console.log('Testing 2: ',emailResult )
+        console.log('Testing 2: ',emailResult)
     
         return rawOtp    // no return
 
     } catch(error) {
-        return 
+        throw error
     }
     
 }

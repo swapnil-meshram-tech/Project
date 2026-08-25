@@ -270,7 +270,7 @@ const sendOtp = async(req, res, next) => {
         
         return res.status(200).json({
             success: true,
-            message: 'Verification code send to your email.',
+            message: 'Verification code sent to your email.',
             otp
         })
 

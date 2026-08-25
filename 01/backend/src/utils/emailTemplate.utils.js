@@ -1,6 +1,6 @@
 const otpEmailTemplate = (otp) =>{
     return `
-        <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" align="center" style="background-color: #f3f4f6; width: 100%;">
+        <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" align="center" style="background-color: ghostwhite; width: 100%;">
             <tr>
                 <td align="center" valign="top" style="padding: 40px 16px;">
 
@@ -22,7 +22,7 @@ const otpEmailTemplate = (otp) =>{
                                     Use the following verification code to complete your request.
                                 </p>
 
-                                <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="background-color: #f9fafb; border-radius: 14px; border: 1px solid #e5e7eb; margin-bottom: 24px;">
+                                <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="background-color: ghostwhite; border-radius: 14px; border: 1px solid #e5e7eb; margin-bottom: 24px;">
                                     <tr>
                                         <td align="center" style="padding: 22px 16px;">
                                             <span style="font-family: 'SFMono-Regular', Consolas, 'Liberation Mono', Menlo, monospace; font-size: 34px; font-weight: 700; letter-spacing: 8px; color: #111827; white-space: nowrap;">

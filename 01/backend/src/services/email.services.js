@@ -9,7 +9,7 @@ const resend = new Resend(config.RESEND_API_KEY)
 const sendOtpToEmail = async(email, otp) => {
     try { 
         const { data, error } = await resend.emails.send({
-            from: 'onboarding@resend.dev',
+            from: config.RESEND_EMAIL_FROM,
             to: email,
             subject: 'Your verification code',
             html: otpEmailTemplate(otp) 

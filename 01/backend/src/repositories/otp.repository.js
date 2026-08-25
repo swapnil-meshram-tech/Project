@@ -1,6 +1,10 @@
 const Otp = require('../models/otp.model')
 
-const storeOtp = async (email, hashedOtp, otpExpiresAt) => {
+const storeOtp = (email, hashedOtp, otpExpiresAt) => {
+    if(!email || !hashedOtp || !otpExpiresAt) {
+        throw new Error('All fields are required.')
+    }
+
     return Otp.findOneAndUpdate(
         { email },
         { 

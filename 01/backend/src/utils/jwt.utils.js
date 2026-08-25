@@ -3,7 +3,7 @@ const config = require('../configs/env')
 const { generateUUID } = require('../utils/crypto.utils')
 const { AppError } = require('../utils/apperror.utils')
 
-const generateAccessToken = (userId, role, sessionId) =>{
+const generateAccessToken = (userId, role, sessionId) => {
    if(!userId || !role || !sessionId) throw new Error('All fields are required.')
 
    return jwt.sign({
