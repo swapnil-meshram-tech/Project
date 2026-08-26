@@ -1,7 +1,7 @@
 const http = require('http')
 const app = require('./src/app')
 const { connectDB, disconnectDB } = require('./src/configs/db')
-const { connectRedis } = require('./src/configs/redis')
+const { getRedis, connectRedis, disconnectRedis } = require('./src/configs/redis')
 const config = require('./src/configs/env')
 
 let server = null 
@@ -9,13 +9,7 @@ let server = null
 const startServer = async() => {
     try {
         await connectDB()
-
-        // try {
-            await connectRedis()
-
-        // } catch(redisError) {
-        //     console.warn(`Warning: Server starting without Redis cache: ${redisError.message}`)
-        // }
+        await connectRedis()
         
         server = http.createServer(app)
         
@@ -25,11 +19,11 @@ const startServer = async() => {
         })
         
         server.listen(config.PORT, () =>{
-           console.log(`\nServer running on: http://localhost:${config.PORT}`)
+           console.log(`\nServer: Running on port http://localhost:${config.PORT}`)
         })
         
     } catch(error){
-        console.error(`Server startup error: ${error}`)
+        console.error(`Server: Startup failed: ${error}`)
         process.exit(1)
     }
 }
@@ -48,30 +42,30 @@ process.on('uncaughtException', (error) => {
 })
 
 
-const shutdown = async (signal) => {
-    console.log(`${signal} received. Shutting down...`)
+const handleGracefulShutdown = async (signal) => {
+    console.log(`[ShutDown] ${signal} received. Shutting down...`)
             
     const forceTimeout = setTimeout(() => {
         console.error('Forced shutdown triggered: Connections failed to close in time.')
         process.exit(1)
     }, 15000)
 
-    server.close(async () => {
-        clearTimeout(forceTimeout) // Clear the safety timer on clean exit
-                
-        try {
-            await disconnectDB()
-            console.log('Server shut down.')
-            process.exit(0)
-        } catch (err) {
-            console.error('Error during shut down:', err.message)
-            process.exit(1)
-        }
-    })
+    clearTimeout(forceTimeout) // Clear the safety timer on clean exit
+            
+    try {
+        await disconnectDB()
+        await disconnectRedis()
+        
+        console.log('Server shut down.')
+        process.exit(0)
+    } catch (err) {
+        console.error('Shut down failed:', err.message)
+        process.exit(1)
+    }
  }
 
 
-process.on('SIGINT', () => gracefulShutdown('SIGINT'))
-process.on('SIGTERM', () => gracefulshutdown('SIGTERM')) // For cloud servers
+process.on('SIGINT', () => handleGracefulShutdown('SIGINT'))
+process.on('SIGTERM', () => handleGracefulShutdown('SIGTERM')) // For cloud servers
         
 

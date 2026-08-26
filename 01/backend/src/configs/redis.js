@@ -6,6 +6,8 @@ const MAX_CONNECTION_RETRIES = 10
 let redis = null
 
 const getRedis = () => {
+    // console.log(redis);
+
     if(!redis || redis.status === 'end') {
         redis = new Redis({
             host: config.REDIS_HOST,
@@ -38,41 +40,46 @@ const getRedis = () => {
         
         redis.on('ready', () => console.log('Redis: Client state is ready to process.'))
         
-        redis.on('error', (error) => console.error(`Redis: Error: ${error.message || error}`))
+        redis.on('error', (error) => {
+            console.error(`Redis Error: ${error.message || error}`)
+        })
 
         redis.on('reconnecting', (delay) => console.warn(`\nRedis: Attempting reconnection in ${delay} ms.`))
        
-        redis.on('end', () => console.error(`\nRedis: Connection pool has been permanently closed.`))
+        redis.on('end', () => {
+            console.error(`\nRedis: Connection pool has been permanently closed.`)
+            process.exit(1)
+        })
     }
+    // console.log(redis.status);
     return redis
 }
 
 
 const connectRedis = async() => {
     const client = getRedis()
-
+    // console.log(client.status);
+    
     if(client.status === 'ready') return client
 
     try {
-        if(client.status !== 'ready') {
-            const ready = await new Promise((resolve, reject) => {
+        const ready = new Promise((resolve, reject) => {
                 
-                function onReady() {
-                    client.off('ready', onReady)
-                    client.off('error', onError)
-                    resolve()
-                }
+            function onReady() {
+                client.off('ready', onReady)
+                client.off('error', onError)
+                resolve()
+            }
 
-                function onError(error) {
-                    client.off('ready', onReady)
-                    client.off('ready', onError)
-                    reject(error)
-                }
+            function onError(error) {
+                client.off('ready', onReady)
+                client.off('error', onError)
+                reject(error)
+            }
 
-                client.once('ready', onReady)
-                client.once('error', onError)
-            })   
-        }
+            client.once('ready', onReady)
+            client.once('error', onError)
+        })   
 
         if(client.status === 'wait') {
             client.connect().catch(() => {})
@@ -83,6 +90,7 @@ const connectRedis = async() => {
 
     } catch(error) {
         console.error(`Redis: Startup failed: ${error.message}`)
+        
         throw error
     }
 }
@@ -95,10 +103,17 @@ const disconnectRedis = async() => {
         if(redis.status === 'ready' || redis.status === 'connect') {
             await redis.quit()
             console.log('Redis: Connection pool terminated gracefully.')
+        } else {
+            redis.disconnect()
         }
     } catch(error) {
         console.error(`Redis: Graceful shutdown failed: ${error.message}`)
-        redis.disconnect()
+        try {
+            redis.disconnect()
+        
+        } catch(error) {
+            console.error(`Redis: Force disconnection failed: ${error.message}`)
+        }  
     } finally {
         redis = null
     }
@@ -106,5 +121,6 @@ const disconnectRedis = async() => {
 
 module.exports = { 
     getRedis, 
-    connectRedis
+    connectRedis,
+    disconnectRedis
 }
