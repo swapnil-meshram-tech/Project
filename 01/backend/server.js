@@ -1,8 +1,8 @@
 const http = require('http')
 const app = require('./src/app')
 const config = require('./src/configs/env')
-const { connectDB, disconnectDB } = require('./src/configs/db')
-const { getRedis, connectRedis, disconnectRedis } = require('./src/configs/redis')
+const { connectDB, disconnectDB } = require('./src/database/db')
+const { getRedis, connectRedis, disconnectRedis } = require('./src/redis/client')
 
 let server = null 
 

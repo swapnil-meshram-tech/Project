@@ -1,5 +1,5 @@
 const { generateOtp, hashOtp } = require('../utils/otp.utils')
-const { storeOtp, findOtp } = require('../repositories/otp.repository')
+const { storeOtp, findOtp } = require('../database/repositories/otp.repository')
 const { sendOtpToEmail } = require('../services/email.services.js')
 const { AppError } = require('../utils/apperror.utils.js')
 

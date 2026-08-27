@@ -1,6 +1,6 @@
 const { REFRESH_COOKIE_OPTIONS, REFRESH_COOKIE_MAX_AGE } = require('../configs/cookie.config.js')
-const { verifyUserExistence, createUser, findUserByIdentifier } = require('../repositories/auth.repository.js')
-const { createSession, findActiveSessionIds, deleteSession, deleteAllSessions, revokeSession, revokeAllSessions } = require('../repositories/session.repository.js')
+const { verifyUserExistence, createUser, findUserByIdentifier } = require('../database/repositories/auth.repository.js')
+const { createSession, findActiveSessionIds, deleteSession, deleteAllSessions, revokeSession, revokeAllSessions } = require('../database/repositories/session.repository.js')
 const { generateAccessToken, generateRefreshToken } = require('../utils/jwt.utils')
 const { tokenBlacklisting } = require('../utils/blacklist.utils')
 const { AppError } = require('../utils/apperror.utils.js')

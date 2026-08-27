@@ -1,5 +1,5 @@
-const User = require('../models/user.model')
-const { findUserByIdentifier, findUserById, changeEmailById, compareEmailById, changeEmail, changePassword } = require('../repositories/user.repository')
+const User = require('../database/models/user.model')
+const { findUserByIdentifier, findUserById, changeEmailById, compareEmailById, changeEmail, changePassword } = require('../database/repositories/user.repository')
 const { AppError } = require('../utils/apperror.utils')
 
 // const getProfile = async (req, res, next) =>{

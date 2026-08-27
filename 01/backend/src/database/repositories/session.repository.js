@@ -1,5 +1,5 @@
 const Session = require('../models/session.model')
-const { hashToken } = require('../utils/crypto.utils')
+const { hashToken } = require('../../utils/crypto.utils')
 
 const getSessionExpiry = () => new Date(Date.now() + 7 * 24 * 60 * 60 * 1000)
 

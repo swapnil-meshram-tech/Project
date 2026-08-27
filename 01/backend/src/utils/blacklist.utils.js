@@ -1,4 +1,4 @@
-const { getRedis } = require('../configs/redis')
+const { getRedis } = require('../redis/client')
 const { AppError } = require('../utils/apperror.utils')
 
 const tokenBlacklisting = async (jti, exp, type) => {

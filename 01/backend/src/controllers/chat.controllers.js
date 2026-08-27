@@ -1,4 +1,4 @@
-const { createChat, findAllChats, findRecentChats} = require('../repositories/chat.repository')
+const { createChat, findAllChats, findRecentChats} = require('../database/repositories/chat.repository')
 const { generateAIResponse } = require('../utils/ai.utils')
 const { AppError } = require('../utils/apperror.utils')
 
