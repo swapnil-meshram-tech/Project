@@ -24,7 +24,7 @@ const getRedis = () => {
             retryStrategy(times) {
 
                 if(times > MAX_CONNECTION_RETRIES) {
-                    console.error('Redis failure: Maximum reconnect attempts reached. Stopping retries.')
+                    console.error('[ERROR] Redis failure: Maximum reconnect attempts reached. Stopping retries.')
                     return false
                 }
                 
@@ -36,18 +36,18 @@ const getRedis = () => {
             }
         })
 
-        redis.on('connect', () => console.log('Redis: TCP socket connection established.'))
+        redis.on('connect', () => console.log('[INFO] Redis: TCP socket connection established.'))
         
-        redis.on('ready', () => console.log('Redis: Client state is ready to process.'))
+        redis.on('ready', () => console.log('[INFO] Redis: Client state is ready to process.'))
         
         redis.on('error', (error) => {
-            console.error(`Redis Error: ${error.message || error}`)
+            console.error(`[ERROR] Redis: ${error.message || error}`)
         })
 
-        redis.on('reconnecting', (delay) => console.warn(`\nRedis: Attempting reconnection in ${delay} ms.`))
+        redis.on('reconnecting', (delay) => console.warn(`\n[WARN] Redis: Attempting reconnection in ${delay} ms.`))
        
         redis.on('end', () => {
-            console.error(`\nRedis: Connection pool has been permanently closed.`)
+            console.error(`\n[ERROR] Redis: Connection pool has been permanently closed.`)
             process.exit(1)
         })
     }
@@ -89,7 +89,7 @@ const connectRedis = async() => {
         return client
 
     } catch(error) {
-        console.error(`Redis: Startup failed: ${error.message}`)
+        console.error(`[ERROR] Redis: Startup failed: ${error.message}`)
         
         throw error
     }

@@ -1,69 +1,87 @@
 const http = require('http')
 const app = require('./src/app')
+const config = require('./src/configs/env')
 const { connectDB, disconnectDB } = require('./src/configs/db')
 const { getRedis, connectRedis, disconnectRedis } = require('./src/configs/redis')
-const config = require('./src/configs/env')
 
 let server = null 
 
 const startServer = async() => {
     try {
+        console.log(`\n[INFO] Server: Connecting databases ...`)
+
         await connectDB()
         await connectRedis()
         
         server = http.createServer(app)
-        
+
         server.on('error', (error) => {
-            console.error(`\nServer error: ${error.message}`)
+            console.error('\n[ERROR] Server:', {
+                code: error.code,
+                message: error.message
+            })
+            
             process.exit(1)
         })
         
         server.listen(config.PORT, () =>{
-           console.log(`\nServer: Running on port http://localhost:${config.PORT}`)
+           console.log(`\n[INFO] Server: Running on port http://localhost:${config.PORT}`)
         })
         
     } catch(error){
-        console.error(`Server: Startup failed: ${error}`)
+        console.error(`[ERROR] Server: Startup failed: ${error}`)
         process.exit(1)
     }
 }
 
 startServer()
 
-
 process.on('unhandledRejection', (error) => {
-    console.error(`Unhandled Rejection: ${error}`)
+    console.error(`[CRITICAL] Server: Unhandled Rejection: ${error}`)
     process.exit(1)
 })
 
 process.on('uncaughtException', (error) => {
-    console.error(`Uncaught Exception: ${error}`)
+    console.error(`[CRITICAL] Server: Uncaught Exception: ${error}`)
     process.exit(1)
 })
 
 
 const handleGracefulShutdown = async (signal) => {
-    console.log(`[ShutDown] ${signal} received. Shutting down...`)
+    console.log(`\n[INFO] Server: ${signal} received. Initiating graceful shutdown ...`)
             
     const forceTimeout = setTimeout(() => {
-        console.error('Forced shutdown triggered: Connections failed to close in time.')
+        console.error('[ERROR] Server: Forced shutdown triggered.')
         process.exit(1)
     }, 15000)
-
-    clearTimeout(forceTimeout) // Clear the safety timer on clean exit
             
     try {
+        if(server){
+            server.closeAllConnections()
+
+            await new Promise((resolve, reject) => {
+                server.close(() =>{
+                    console.log('[INFO] Server: HTTP port network listener completely closed.')
+                    resolve()  
+                })
+            })
+        }
+
         await disconnectDB()
         await disconnectRedis()
+
+        clearTimeout(forceTimeout)
         
-        console.log('Server shut down.')
+        console.log('[INFO] Server: System stoped gracefully.')
         process.exit(0)
+
     } catch (err) {
-        console.error('Shut down failed:', err.message)
+        clearTimeout(forceTimeout)
+
+        console.error('[ERROR] Server: Shutdown failed:', err.message)
         process.exit(1)
     }
- }
-
+}
 
 process.on('SIGINT', () => handleGracefulShutdown('SIGINT'))
 process.on('SIGTERM', () => handleGracefulShutdown('SIGTERM')) // For cloud servers

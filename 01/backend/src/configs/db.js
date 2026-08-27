@@ -3,22 +3,24 @@ const config = require('../configs/env')
 
 const connectDB = async() =>{
     try{
-        const connect = await mongoose.connect(`${config.MONGODB_URI}/${config.DB_NAME}`)
-        console.log(`DB connected: ${connect.connection.host}`)
+        const connect = await mongoose.connect(config.MONGODB_URI, {
+            dbName: config.MONGODB_NAME
+        })
+        console.log(`[INFO] Database: Connection established on host: ${connect.connection.host}`)
         
-    } catch(err){
-        console.error('DB connection error:', err.message)
+    } catch(error){
+        console.error('[ERROR] Database: Initial connection failed:', error.message)
         process.exit(1)
     }
 }
 
-const disconnectDB = async () => {
+const disconnectDB = async() => {
     try {
-        await mongoose.connection.close()
-        console.log('DB disconnected.')
+        await mongoose.disconnect
+        console.log('[INFO] Database: Connection pool closed.')
 
-    } catch (err) {
-        console.error('DB disconnection error:', err.message)
+    } catch(error) {
+        console.error(`[ERROR] Database: Termination failed: ${error.message}`)
     }
 }
 
