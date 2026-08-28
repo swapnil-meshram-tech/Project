@@ -7,10 +7,6 @@ mongoose.connection.on('connected', () => {
     console.log(`[INFO] Database: Connection established on host: ${mongoose.connection.host}`)
 })
 
-mongoose.connection.on('reconnected', () => {
-    console.log(`[INFO] Database: Connection restored successfully.`)
-})
-
 mongoose.connection.on('error', (error) => {
     console.error('[ERROR] Database: Runtime exception occurred:', {
         name: error.name,
@@ -30,7 +26,7 @@ const connectDB = async() => {
     const { readyState } = mongoose.connection
 
     if(readyState === 1 || readyState === 2) {
-        console.log('[INFO] Database: Connection is already active. Skipping reconnection.')
+        console.log('[INFO] Database: Connection already active or in progress. Skipping connection attempt.')
         return
     } 
 
@@ -52,7 +48,7 @@ const connectDB = async() => {
             name: error.name,
             message: error.message
         })
-        process.exit(1)
+        throw error
     }
 }
 
