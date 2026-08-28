@@ -1,0 +1,6 @@
+/roadmap/
+
+/backend/node_modules/
+/backend/tests/
+/backend/.env*
+/backend/test.js
