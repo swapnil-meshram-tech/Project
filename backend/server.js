@@ -6,9 +6,9 @@ const { getRedis, connectRedis, disconnectRedis } = require('./src/redis/client'
 
 let server = null 
 
-const startServer = async() => {
+const startServer = async () => {
     try {
-        console.log(`\n[INFO] Server: Connecting databases ...`)
+        console.log('\n[INFO] Server: Connecting to database ...')
 
         await connectDB()
         await connectRedis()
@@ -16,20 +16,20 @@ const startServer = async() => {
         server = http.createServer(app)
 
         server.on('error', (error) => {
-            console.error('\n[ERROR] Server:', {
+            console.error('\n[ERROR] Server: Runtime error occured:', {
                 code: error.code,
                 message: error.message
             })
-            
             process.exit(1)
         })
         
         server.listen(config.PORT, '0.0.0.0', () =>{
-           console.log(`\n[INFO] Server: Running on port http://localhost:${config.PORT}`)
+        //    console.log(`\n[INFO] Server: Running on port http://localhost:${config.PORT}`)
+           console.log(`\n[INFO] Server: Running on port 0.0.0.0:${config.PORT}`)
         })
         
     } catch(error){
-        console.error(`[ERROR] Server: Startup failed: ${error}`)
+        console.error('[ERROR] Server: Startup failure:', error)
         process.exit(1)
     }
 }
@@ -37,12 +37,12 @@ const startServer = async() => {
 startServer()
 
 process.on('unhandledRejection', (error) => {
-    console.error(`[CRITICAL] Server: Unhandled Rejection: ${error}`)
+    console.error('[CRITICAL] Server: Unhandled Rejection:', error)
     process.exit(1)
 })
 
 process.on('uncaughtException', (error) => {
-    console.error(`[CRITICAL] Server: Uncaught Exception: ${error}`)
+    console.error('[CRITICAL] Server: Uncaught Exception:', error)
     process.exit(1)
 })
 
