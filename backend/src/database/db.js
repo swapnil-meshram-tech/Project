@@ -1,5 +1,6 @@
 const mongoose = require('mongoose')
 const config = require('../configs/env')
+const { formatError } = require('../utils/formatError.utils')
 
 let isShutdown = false
 
@@ -8,10 +9,7 @@ mongoose.connection.on('connected', () => {
 })
 
 mongoose.connection.on('error', (error) => {
-    console.error('[ERROR] Database: Runtime exception occurred:', {
-        name: error.name,
-        message: error.message
-    })
+    console.error('[ERROR] Database: Runtime exception occurred:', formatError(error))
 })
 
 mongoose.connection.on('disconnected', () => {
@@ -22,11 +20,11 @@ mongoose.connection.on('disconnected', () => {
     }
 })
 
-const connectDB = async() => {
+const connectDB = async () => {
     const { readyState } = mongoose.connection
 
     if(readyState === 1 || readyState === 2) {
-        console.log('[INFO] Database: Connection already active or in progress. Skipping connection attempt.')
+        console.log('[INFO] Database: Connection already active or in progress. Skipping reconnection attempt.')
         return
     } 
 
@@ -44,29 +42,20 @@ const connectDB = async() => {
         })
 
     } catch(error) {
-        console.error('[CRITICAL] Database: Initial startup connection failed:', {
-            name: error.name,
-            message: error.message
-        })
+        console.error('[CRITICAL] Database: Initial startup connection failed:', formatError(error))
         throw error
     }
 }
 
-const disconnectDB = async() => {
+const disconnectDB = async () => {
     isShutdown = true
 
     try {
         await mongoose.disconnect()      
-
     } catch(error) {
-        console.error('[ERROR] Database: Connection pool termination failed:', {
-            name: error.name,
-            message: error.message
-        })
+        console.error('[ERROR] Database: Connection pool termination failed:', formatError(error))
     }
 }
-
-
 
 module.exports = { 
     connectDB,
