@@ -18,7 +18,7 @@ const startServer = async () => {
         server = http.createServer(app)
 
         server.on('error', (error) => {
-            console.error('\n[ERROR] Server: Runtime error occurred:', formatError(error))
+            console.error('\n[ERROR] Server: Runtime error:', formatError(error))
             process.exit(1)
         })
         
@@ -65,7 +65,7 @@ const handleGracefulShutdown = async (signal) => {
 
         clearTimeout(forceTimeout)
 
-        console.log('[INFO] Server: System stopped gracefully.')
+        console.log('[INFO] Server: Shutdown gracefully.')
         process.exit(0)
 
     } catch (error) {

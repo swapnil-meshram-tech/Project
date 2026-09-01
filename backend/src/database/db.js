@@ -9,12 +9,12 @@ mongoose.connection.on('connected', () => {
 })
 
 mongoose.connection.on('error', (error) => {
-    console.error('[ERROR] Database: Runtime exception occurred:', formatError(error))
+    console.error('[ERROR] Database: Connection error:', formatError(error))
 })
 
 mongoose.connection.on('disconnected', () => {
     if(isShutdown) {
-        console.log('[INFO] Database: Connection pool closed safely.')
+        console.log('[INFO] Database: Connection closed safely.')
     } else {
         console.warn('[WARN] Database: Connection lost unexpectedly. Mongoose will attempt reconnection.')
     }
@@ -53,7 +53,7 @@ const disconnectDB = async () => {
     try {
         await mongoose.disconnect()      
     } catch(error) {
-        console.error('[ERROR] Database: Connection pool termination failed:', formatError(error))
+        console.error('[ERROR] Database: Connection termination failed:', formatError(error))
     }
 }
 
