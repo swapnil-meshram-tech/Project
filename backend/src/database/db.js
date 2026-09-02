@@ -14,9 +14,9 @@ mongoose.connection.on('error', (error) => {
 
 mongoose.connection.on('disconnected', () => {
     if(isShutdown) {
-        console.log('[INFO] Database: Connection closed safely.')
+        console.log('[INFO] Database: Connection closed gracefully.')
     } else {
-        console.warn('[WARN] Database: Connection lost unexpectedly. Mongoose will attempt reconnection.')
+        console.warn('[WARN] Database: Connection lost unexpectedly. Attempting auto reconnection.')
     }
 })
 
@@ -24,7 +24,7 @@ const connectDB = async () => {
     const { readyState } = mongoose.connection
 
     if(readyState === 1 || readyState === 2) {
-        console.log('[INFO] Database: Connection already active or in progress. Skipping reconnection attempt.')
+        console.log('[INFO] Database: Connection already active or in progress. Skipping connection attempt.')
         return
     } 
 
@@ -40,9 +40,8 @@ const connectDB = async () => {
             maxPoolSize: 50,
             minPoolSize: 5,
         })
-
     } catch(error) {
-        console.error('[CRITICAL] Database: Initial startup connection failed:', formatError(error))
+        console.error('[CRITICAL] Database: Initial connection failed:', formatError(error))
         throw error
     }
 }

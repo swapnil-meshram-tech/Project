@@ -28,7 +28,8 @@ REQUIRED_ENV_VARS.forEach((envVar) =>{
 })
 
 const config = {
-    PORT: parseInt(process.env.PORT, 10) || 5000, 
+    HOST: process.env.HOST || '127.0.0.1', 
+    PORT: Number.parseInt(process.env.PORT, 10) || 5000, 
     CORS_ORIGINS: process.env.CORS_ORIGINS ? process.env.CORS_ORIGINS.split(',') : ['http://localhost:3000'],
     MONGODB_URI: process.env.MONGODB_URI,
     MONGODB_NAME: process.env.DB_NAME,

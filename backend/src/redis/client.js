@@ -5,6 +5,7 @@ const { formatError } = require('../utils/formatError.utils')
 const MAX_CONNECTION_RETRIES = 10
 
 let redis = null
+let isShutdown = false
 
 const getRedis = () => {
     if(!redis || redis.status === 'end') {
@@ -35,16 +36,20 @@ const getRedis = () => {
 
         redis.on('connect', () => console.log('[INFO] Redis: Connection established.'))
         
-        redis.on('ready', () => console.log('[INFO] Redis: Ready to process.'))
+        redis.on('ready', () => console.log('[INFO] Redis: Ready to process requests.'))
         
         redis.on('error', (error) => {
-            console.error('[ERROR] Redis error:', formatError(error))
+            console.error('[ERROR] Redis: Connection error:', formatError(error))
         })
 
         redis.on('reconnecting', (delay) => console.warn(`\n[WARN] Redis: Attempting reconnection in ${delay} ms.`))
        
         redis.on('end', () => {
-            console.error(`\n[ERROR] Redis: Connection has been permanently closed.`)
+            if(isShutdown) {
+                console.log('[INFO] Redis: Connection closed gracefully.')
+            } else {
+                console.error('[ERROR] Redis: Connection permanently closed.')
+            }
         })
     }
     return redis
@@ -54,6 +59,8 @@ const connectRedis = async () => {
     const client = getRedis()
     
     if(client.status === 'ready') return client
+    
+    isShutdown = false
 
     try {
         if(client.status === 'wait') {
@@ -62,7 +69,7 @@ const connectRedis = async () => {
         return client
 
     } catch(error) {
-        console.error('[ERROR] Redis: Initial startup failed:', formatError(error))
+        console.error('[ERROR] Redis: Initial connection failed:', formatError(error))
         throw error
     }
 }
@@ -70,20 +77,23 @@ const connectRedis = async () => {
 const disconnectRedis = async() => {
     if(!redis) return 
 
+    isShutdown = true
+
     try {
         if(redis.status === 'connect' || redis.status === 'ready') {
             await redis.quit()
-            console.log('[INFO] Redis: Connection closed gracefully.')
+            // console.log('[INFO] Redis: Connection closed gracefully.')
+
         } else {
             redis.disconnect()
         }
     } catch(error) {
-        console.error('[ERROR] Redis: Graceful shutdown failed:', formatError(error))
+        console.error('[ERROR] Redis: Connection termination failed:', formatError(error))
         try {
             redis.disconnect()
         
-        } catch(error) {
-            console.error('[ERROR] Redis: Force disconnection failed:', formatError(error))
+        } catch(forceError) {
+            console.error('[ERROR] Redis: Force disconnection failed:', formatError(forceError))
         }  
     } finally {
         redis = null

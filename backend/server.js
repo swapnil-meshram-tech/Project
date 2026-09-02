@@ -10,25 +10,26 @@ let isShutdown = false
 
 const startServer = async () => {
     try {
-        console.log('\n[INFO] Server: Connecting to database ...')
-
+        console.log('\n[INFO] Server: Connecting to Database ...')
         await connectDB()
+
+        console.log('\n[INFO] Server: Connecting to Redis ...')
         await connectRedis()
         
         server = http.createServer(app)
 
         server.on('error', (error) => {
-            console.error('\n[ERROR] Server: Runtime error:', formatError(error))
+            console.error('\n[ERROR] Server: HTTP server error:', formatError(error))
             process.exit(1)
         })
         
-        server.listen(config.PORT, '0.0.0.0', () =>{
+        server.listen(config.PORT, config.HOST, () =>{
         //    console.log(`\n[INFO] Server: Running on port http://localhost:${config.PORT}`)
-           console.log(`\n[INFO] Server: Running on port 0.0.0.0:${config.PORT}`)
+           console.log(`\n[INFO] Server: Running on http://${config.HOST}:${config.PORT}`)
         })
         
     } catch(error){
-        console.error('[CRITICAL] Server: Startup failure:', formatError(error))
+        console.error('[CRITICAL] Server: Initial startup failed:', formatError(error))
         process.exit(1)
     }
 }
@@ -54,7 +55,7 @@ const handleGracefulShutdown = async (signal) => {
                 server.close((error) =>{
                     if(error) return reject(error)
                         
-                    console.log('[INFO] Server: HTTP port network listener completely closed.')
+                    console.log('[INFO] Server: HTTP server closed.')
                     resolve()  
                 })
             })
@@ -65,23 +66,24 @@ const handleGracefulShutdown = async (signal) => {
 
         clearTimeout(forceTimeout)
 
-        console.log('[INFO] Server: Shutdown gracefully.')
+        console.log('[INFO] Server: Shutdown completed successfully.')
         process.exit(0)
 
-    } catch (error) {
+    } catch(error) {
         clearTimeout(forceTimeout)
 
-        console.error('[ERROR] Server: Graceful shutdown failure:', formatError(error))
+        console.error('[ERROR] Server: Graceful shutdown failed:', formatError(error))
         process.exit(1)
     }
 }
 
 process.on('unhandledRejection', async (error) => {
     console.error('[CRITICAL] Server: Unhandled Rejection:', formatError(error))
+    
     try{
         await handleGracefulShutdown('unhandledRejection')
     } catch(shutdownError){
-        console.error('[ERROR] Server: Failed during shutdown after unhandled rejection:', formatError(shutdownError))
+        console.error('[ERROR] Server: Shutdown failed after unhandled rejection:', formatError(shutdownError))
     } finally {
         process.exit(1)
     }
