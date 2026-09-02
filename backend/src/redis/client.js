@@ -4,24 +4,22 @@ const { formatError } = require('../utils/formatError.utils')
 
 const MAX_CONNECTION_RETRIES = 10
 
-let redis = null
+let redisClient = null
 let isShutdown = false
 
-const getRedis = () => {
-    if(!redis || redis.status === 'end') {
-        isShutdown = false
-
-        redis = new Redis({
+const createRedisClient = () => {
+    const redisClient = new Redis({
             host: config.REDIS_HOST,
             port: config.REDIS_PORT,
             password: config.REDIS_PASSWORD,
             
             lazyConnect: true,
-            maxRetriesPerRequest: 3,
-            enableOfflineQueue: false,
             commandTimeout: 5000,
             connectTimeout: 5000,
             enableReadyCheck: true,
+            
+            // maxRetriesPerRequest: 3,
+            // enableOfflineQueue: false,
 
             retryStrategy(times) {
                 if(times > MAX_CONNECTION_RETRIES) {
@@ -36,41 +34,54 @@ const getRedis = () => {
             }
         })
 
-        redis.on('connect', () => console.log('[INFO] Redis: Connection established.'))
+        redisClient.on('connect', () => console.log('[INFO] Redis: Connection established.'))
         
-        redis.on('ready', () => console.log('[INFO] Redis: Ready to process requests.'))
+        redisClient.on('ready', () => console.log('[INFO] Redis: Ready to process requests.'))
         
-        redis.on('error', (error) => {
+        redisClient.on('reconnecting', (delay) => console.warn(`\n[WARN] Redis: Attempting reconnection in ${delay} ms.`))
+        
+        redisClient.on('error', (error) => {
             console.error('[ERROR] Redis: Connection error:', formatError(error))
         })
-
-        redis.on('reconnecting', (delay) => console.warn(`\n[WARN] Redis: Attempting reconnection in ${delay} ms.`))
        
-        redis.on('end', () => {
+        redisClient.on('end', () => {
             console.log("ending");
             
             if(isShutdown) {
                 console.log('[INFO] Redis: Connection closed gracefully.')
             } else {
-                console.error('[ERROR] Redis: Connection permanently closed.')
+                console.error('[ERROR] Redis: Connection ended.')
             }
         })
-    }
-    return redis
+
+    return redisClient
 }
 
+const getRedisClient = () => {
+    if(!redisClient){
+        redisClient = createRedisClient()
+    }
+
+    return redisClient
+}   
+
 const connectRedis = async () => {
-    const client = getRedis()
+    const redisClient = getRedisClient()
     
-    if(client.status === 'ready') return client
+    if(redisClient.status === 'ready') return redisClient
     
-    // isShutdown = false
+    isShutdown = false
 
     try {
-        if(client.status === 'wait') {
-            await client.connect()
+        if(redisClient.status === 'wait') {
+            await redisClient.connect()
         }
-        return client
+
+        if(redisClient.status !== 'ready') {
+            throw new Error(`Redis: Not ready. Current status: ${redisClient.status}`) 
+        }
+
+        return redisClient
 
     } catch(error) {
         console.error('[ERROR] Redis: Initial connection failed:', formatError(error))
@@ -79,36 +90,35 @@ const connectRedis = async () => {
 }
 
 const disconnectRedis = async() => {
-    if(!redis) return 
+    if(!redisClient) return 
     
-    try {
-        isShutdown = true
+    isShutdown = true
 
-        if(redis.status === 'connect' || redis.status === 'ready') {
-            console.log('1 [INFO] Redis: Connection closed gracefully.')
-            await redis.quit()
+    try {
+        if(redisClient.status === 'connect' || redisClient.status === 'ready') {
+            await redisClient.quit()
             console.log('2 [INFO] Redis: Connection closed gracefully.')
             
         } else {
             console.log('3 [INFO] Redis: Connection closed gracefully.')
-            redis.disconnect()
+            redisClient.disconnect()
             console.log('4 [INFO] Redis: Connection closed gracefully.')
         }
     } catch(error) {
         console.error('[ERROR] Redis: Connection termination failed:', formatError(error))
         try {
-            redis.disconnect()
+            redisClient.disconnect()
         
         } catch(forceError) {
             console.error('[ERROR] Redis: Force disconnection failed:', formatError(forceError))
         }  
     } finally {
-        redis = null
+        redisClient = null
     }
 }
 
 module.exports = { 
-    getRedis, 
+    getRedisClient, 
     connectRedis,
     disconnectRedis
 }

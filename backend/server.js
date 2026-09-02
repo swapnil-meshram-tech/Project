@@ -2,7 +2,7 @@ const http = require('http')
 const app = require('./src/app')
 const config = require('./src/configs/env')
 const { connectDB, disconnectDB } = require('./src/database/db')
-const { getRedis, connectRedis, disconnectRedis } = require('./src/redis/client')
+const { getRedisClient, connectRedis, disconnectRedis } = require('./src/redis/client')
 const { formatError } = require('./src/utils/formatError.utils')
 
 let server = null 
