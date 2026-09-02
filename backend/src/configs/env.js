@@ -3,6 +3,7 @@ const dotenv = require('dotenv')
 dotenv.config()
 
 const REQUIRED_ENV_VARS = [
+    'APP_NAME',
     'PORT', 
     'CORS_ORIGINS', 
     'MONGODB_URI', 
@@ -28,6 +29,7 @@ REQUIRED_ENV_VARS.forEach((envVar) =>{
 })
 
 const config = {
+    APP_NAME: process.env.APP_NAME, 
     HOST: process.env.HOST || '127.0.0.1', 
     PORT: Number.parseInt(process.env.PORT, 10) || 5000, 
     CORS_ORIGINS: process.env.CORS_ORIGINS ? process.env.CORS_ORIGINS.split(',') : ['http://localhost:3000'],
