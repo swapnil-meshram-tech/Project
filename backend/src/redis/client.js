@@ -8,7 +8,7 @@ let redisClient = null
 let isShutdown = false
 
 const createRedisClient = () => {
-    const redisClient = new Redis({
+    const client = new Redis({
         host: config.REDIS_HOST,
         port: config.REDIS_PORT,
         password: config.REDIS_PASSWORD,
@@ -18,8 +18,8 @@ const createRedisClient = () => {
         connectTimeout: 5000,
         enableReadyCheck: true,
             
-            // maxRetriesPerRequest: 3,
-            // enableOfflineQueue: false,
+            maxRetriesPerRequest: 3,
+            enableOfflineQueue: false,
 
         retryStrategy(times) {
             if(times > MAX_CONNECTION_RETRIES) {
@@ -27,38 +27,34 @@ const createRedisClient = () => {
                 return null
             }
                 
-            const delay = Math.min(Math.pow(2, times - 1) * 50, 4000)
+            const delay = Math.min(2 ** (times - 1) * 50, 4000)
             const jitter = Math.floor(Math.random() * 250)
 
             return delay + jitter
         }
     })
 
-    redisClient.on('connect', () => console.log('[INFO] Redis: Connection established.'))
+    client.on('connect', () => console.log('[INFO] Redis: Connection established.'))
         
-    redisClient.on('ready', () => console.log('[INFO] Redis: Ready to process requests.'))
+    client.on('ready', () => console.log('[INFO] Redis: Ready to process requests.'))
         
-    redisClient.on('reconnecting', (delay) => console.warn(`\n[WARN] Redis: Attempting reconnection in ${delay} ms.`))
+    client.on('reconnecting', (delay) => console.warn(`\n[WARN] Redis: Attempting reconnection in ${delay} ms.`))
         
-    redisClient.on('error', (error) => {
+    client.on('error', (error) => {
         console.error('[ERROR] Redis: Connection error:', formatError(error))
     })
        
-    redisClient.on('end', () => {
-        console.log("ending");
-            
-        if(isShutdown) {
-            console.log('[INFO] Redis: Connection closed gracefully.')
-        } else {
+    client.on('end', () => {   
+        if(!isShutdown) {
             console.error('[ERROR] Redis: Connection ended.')
         }
     })
 
-    return redisClient
+    return client
 }
 
 const getRedisClient = () => {
-    if(!redisClient){
+    if(!redisClient || redisClient.status === 'end'){
         redisClient = createRedisClient()
     }
 
@@ -66,22 +62,18 @@ const getRedisClient = () => {
 }   
 
 const connectRedis = async () => {
-    const redisClient = getRedisClient()
+    const client = getRedisClient()
     
-    if(redisClient.status === 'ready') return redisClient
+    if(client.status === 'ready') return client
     
     isShutdown = false
 
     try {
-        if(redisClient.status === 'wait') {
-            await redisClient.connect()
+        if(client.status === 'wait') {
+            await client.connect()
         }
 
-        if(redisClient.status !== 'ready') {
-            throw new Error(`Redis: Not ready. Current status: ${redisClient.status}`) 
-        }
-
-        return redisClient
+        return client
 
     } catch(error) {
         console.error('[ERROR] Redis: Initial connection failed:', formatError(error))
@@ -89,7 +81,7 @@ const connectRedis = async () => {
     }
 }
 
-const disconnectRedis = async() => {
+const disconnectRedis = async () => {
     if(!redisClient) return 
     
     isShutdown = true
@@ -97,12 +89,10 @@ const disconnectRedis = async() => {
     try {
         if(redisClient.status === 'connect' || redisClient.status === 'ready') {
             await redisClient.quit()
-            console.log('2 [INFO] Redis: Connection closed gracefully.')
+            console.log('[INFO] Redis: Connection closed gracefully.')
             
         } else {
-            console.log('3 [INFO] Redis: Connection closed gracefully.')
             redisClient.disconnect()
-            console.log('4 [INFO] Redis: Connection closed gracefully.')
         }
     } catch(error) {
         console.error('[ERROR] Redis: Connection termination failed:', formatError(error))
