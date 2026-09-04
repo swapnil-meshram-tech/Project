@@ -12,10 +12,10 @@ let isShutdown = false
 
 const startServer = async () => {
     try {
-        console.log('\n[INFO] Server: Connecting to Database ...')
+        console.log('\n[INFO] Server: Connecting to Database')
         await connectDB()
 
-        console.log('\n[INFO] Server: Connecting to Redis ...')
+        console.log('\n[INFO] Server: Connecting to Redis')
         await connectRedis()
         
         server = http.createServer(app)
@@ -23,7 +23,7 @@ const startServer = async () => {
         server.on('error', (error) => {
             console.error('\n[ERROR] Server: HTTP server error:', formatError(error))
             
-            if(error.code === 'EADDRINUSE' || error.code === 'EACCES'){
+            if(!server.listening){
                 handleGracefulShutdown('serverError')
                 return 
             }
@@ -32,24 +32,15 @@ const startServer = async () => {
         })
         
         server.listen(config.PORT, config.HOST, () =>{
-        //    console.log(`\n[INFO] Server: Running on port http://localhost:${config.PORT}`)
-           console.log(`\n[INFO] Server: Running on http://${config.HOST}:${config.PORT}`)
+            console.log(`\n[INFO] Server: Listening on ${config.HOST}:${config.PORT}`)
+            console.log(`\n[INFO] Server: Client URL: ${config.PUBLIC_URL}`)
         })
         
-    } catch(error){
+    } catch(error) {
         console.error('[CRITICAL] Server: Initial startup failed:', formatError(error))
-        
-        try{
-            await disconnectRedis()
-        } catch(cleanupError){
-            console.error('[CRITICAL] Server: Redis cleanup failed:', formatError(cleanupError))
-        }
 
-        try{
-            await disconnectDB()
-        } catch(cleanupError){
-            console.error('[CRITICAL] Server: Database cleanup failed:', formatError(cleanupError))
-        }
+        await disconnectDB()
+        await disconnectRedis()
 
         process.exit(1)
     }
@@ -67,10 +58,15 @@ const handleGracefulShutdown = async (signal) => {
             
     const forceShutdownTimer = setTimeout(() => {
         console.error('[ERROR] Server: Graceful shutdown timed out. Forcing exit.')
+        
+        if(server) {
+            server.closeAllConnections()
+        }
+
         process.exit(1)
     }, SHUTDOWN_TIMEOUT)
 
-    forceShutdownTimer.unref()
+    console.log("1");
             
     try {
         if(server){
@@ -86,6 +82,8 @@ const handleGracefulShutdown = async (signal) => {
                 })
             })
         }
+
+        console.log("3");
 
         await disconnectDB()
         await disconnectRedis()

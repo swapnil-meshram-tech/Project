@@ -5,6 +5,8 @@ dotenv.config()
 const REQUIRED_ENV_VARS = [
     'APP_NAME',
     'PORT', 
+    'HOST', 
+    'PUBLIC_URL', 
     'CORS_ORIGINS', 
     'MONGODB_URI', 
     'MONGODB_NAME', 
@@ -30,13 +32,14 @@ REQUIRED_ENV_VARS.forEach((envVar) =>{
 
 const config = {
     APP_NAME: process.env.APP_NAME, 
-    HOST: process.env.HOST || '127.0.0.1', 
     PORT: Number.parseInt(process.env.PORT, 10) || 5000, 
+    HOST: process.env.HOST, 
+    PUBLIC_URL: process.env.PUBLIC_URL, 
     CORS_ORIGINS: process.env.CORS_ORIGINS ? process.env.CORS_ORIGINS.split(',') : ['http://localhost:3000'],
     MONGODB_URI: process.env.MONGODB_URI,
     MONGODB_NAME: process.env.DB_NAME,
     REDIS_HOST: process.env.REDIS_HOST,
-    REDIS_PORT: parseInt(process.env.REDIS_PORT,10),
+    REDIS_PORT: parseInt(process.env.REDIS_PORT, 10),
     REDIS_PASSWORD: process.env.REDIS_PASSWORD || '',
     JWT_ACCESS_SECRET: process.env.JWT_ACCESS_SECRET,
     JWT_REFRESH_SECRET: process.env.JWT_REFRESH_SECRET,
