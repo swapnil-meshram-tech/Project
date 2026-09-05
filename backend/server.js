@@ -69,15 +69,22 @@ const handleGracefulShutdown = async (signal) => {
     console.log("1");
             
     try {
-        if(server){
+        if(server){    
             await new Promise((resolve, reject) => {
-                server.close((error) =>{
+                server.close((error) => {
                     if(error) {
-                        console.log('[INFO] Server: HTTP server closed or bypassed. Code:', error.code || 'unknown')
-                    } else {
-                        console.log('[INFO] Server: HTTP server closed.')
-                    }
+                        if(error.code === 'ERR_SERVER_NOT_RUNNING') {
+                            console.log('[INFO] Server: HTTP server closed already closed.')
+
+                            resolve()
+                            return
+                        }  
                         
+                        reject(error)
+                        return
+                    } 
+
+                    console.log('[INFO] Server: HTTP server closed.')   
                     resolve()  
                 })
             })
