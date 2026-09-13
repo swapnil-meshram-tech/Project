@@ -1,9 +1,9 @@
 /roadmap/
 
-/backend/node_modules/
+/app/node_modules/
 
-/backend/tests/
-/backend/test.js
+/app/tests/
+/app/test.js
 
-/backend/.env
-/backend/.env.*
+/app/.env
+app/.env.*
