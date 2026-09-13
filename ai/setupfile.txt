@@ -1,0 +1,165 @@
+
+1. Go to project
+cd "$HOME\Desktop\Project\backend.2.0"
+
+2. Check Python
+python --version
+
+
+Expected:
+
+Python 3.13.12
+
+3. Check uv
+uv --version
+
+
+Expected:
+
+uv 0.12.7
+
+4. Initialize project
+
+If you haven't already initialized it:
+
+uv init
+
+
+If pyproject.toml already exists, don't run uv init again.
+
+5. Create virtual environment
+uv venv
+
+
+This creates:
+
+.venv/
+
+6. Activate virtual environment
+.venv\Scripts\activate
+
+
+You should see:
+
+(backend.2.0)
+
+7. Check Python inside environment
+python --version
+
+8. Add FastAPI
+uv add fastapi
+
+9. Add Uvicorn
+
+Use:
+
+uv add uvicorn
+
+
+Don't use uvicorn[standard] for now. You don't need the extra for your basic setup.
+
+10. Verify packages
+uv pip show fastapi uvicorn
+
+
+You should see both packages.
+
+11. Create your source structure
+backend.2.0/
+├── .gitignore
+├── .python-version
+├── README.md
+├── pyproject.toml
+├── uv.lock
+├── .venv/
+└── src/
+    └── backend_2_0/
+        ├── __init__.py
+        └── main.py
+
+
+Keep the existing src/backend_2_0/__init__.py.
+
+12. Create main.py
+
+Location:
+
+src/backend_2_0/main.py
+
+
+Put:
+
+from fastapi import FastAPI
+
+app = FastAPI(title="Backend API")
+
+
+@app.get("/")
+def root():
+    return {"message": "Backend is running"}
+
+13. Check pyproject.toml
+
+Remove this if you added it earlier:
+
+[tool.uv.scripts]
+dev = "uv run uvicorn backend_2_0.main:app --reload"
+
+
+Don't use uv run dev.
+
+14. Update lock file
+uv lock
+
+15. Run the backend
+
+From:
+
+backend.2.0>
+
+
+run:
+
+uv run python -m uvicorn backend_2_0.main:app --reload
+
+
+You should see:
+
+Uvicorn running on http://127.0.0.1:8000
+Application startup complete.
+
+16. Test
+
+Open:
+
+http://127.0.0.1:8000
+
+
+You should get:
+
+{"message":"Backend is running"}
+
+
+Then:
+
+http://127.0.0.1:8000/docs
+
+
+You should see the FastAPI Swagger documentation.
+
+17. Stop server
+Ctrl + C
+
+Your important commands
+cd "$HOME\Desktop\Project\backend.2.0"
+uv --version
+python --version
+uv venv
+.venv\Scripts\activate
+uv add fastapi
+uv add uvicorn
+uv pip show fastapi uvicorn
+uv lock
+uv run python -m uvicorn backend_2_0.main:app --reload
+
+
