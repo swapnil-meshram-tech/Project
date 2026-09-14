@@ -163,3 +163,11 @@ uv lock
 uv run python -m uvicorn backend_2_0.main:app --reload
 
 
+
+
+
+
+
+uv init
+uv add fastapi uvicorn
+uv run uvicorn ai.main:app --reload

@@ -6,4 +6,4 @@
 /app/test.js
 
 /app/.env
-app/.env.*
+/app/.env.*
