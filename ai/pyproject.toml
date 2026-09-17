@@ -8,20 +8,12 @@ authors = [
 ]
 requires-python = ">=3.13"
 dependencies = [
-    "alembic>=1.20.0",
-    "fastapi>=0.141.1",
-    "psycopg[binary]>=3.3.5",
+    "fastapi[standard]>=0.141.1",
+    "mistralai>=2.10.1",
     "pydantic-settings>=2.15.0",
-    "sqlalchemy>=2.0.53",
-    "uvicorn[standard]>=0.52.4",
+    "python-dotenv>=1.2.3",
+    "ruff>=0.16.7",
 ]
-
-[project.scripts]
-ai = "ai:main"
-
-[build-system]
-requires = ["uv_build>=0.12.7,<0.13.0"]
-build-backend = "uv_build"
 
 [dependency-groups]
 dev = [
